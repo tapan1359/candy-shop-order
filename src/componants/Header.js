@@ -16,7 +16,7 @@ import AdbIcon from '@mui/icons-material/Adb';
 const pages = ['Orders', 'New Orders'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
-function Header({activePage, hndlePageChange}) {
+function Header({ activePage, hndlePageChange }) {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 

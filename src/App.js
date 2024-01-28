@@ -6,26 +6,18 @@ import Header from './componants/Header';
 import OrderIndex from './screens/orders/OrderIndex';
 import NewOrderIndex from './screens/newOrders/NewOrderIndex';
 import { Box } from '@mui/material';
-
-
+import UpdateDataScreen from './screens/update/UpdateData';
 
 function App() {
-    // getOrders({
-    //   // params: {
-    //   //   // min_date_created: '2023-01-01',
-    //   //   // max_date_created: '2023-01-02',
-    //   // }
-    //   order_id: 172
-    // });
-
-    const [activePage, setActivePage] = useState('New Orders');
+  const [activePage, setActivePage] = useState('Update Data');
 
   return (
-   <Box className="App">
+    <Box className="App">
       <Header activePage={activePage} hndlePageChange={setActivePage} />
       <Box sx={{ height: '64px' }} />
       {activePage === 'Orders' && <OrderIndex />}
       {activePage === 'New Orders' && <NewOrderIndex />}
+      {activePage === 'Update Data' && <UpdateDataScreen />}
     </Box>
   );
 }

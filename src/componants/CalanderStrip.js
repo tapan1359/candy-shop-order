@@ -2,21 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { Box } from '@mui/material';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { setActiveFilters } from '../redux/settings/ordersSetting';
 import { useDispatch, useSelector } from 'react-redux';
+import { setActiveFilters } from '../redux/settings/ordersSetting';
 
 export default function CalanderStrip() {
   const [dates, setDates] = useState([]);
   const [todayIndex, setTodayIndex] = useState(0);
   const [activeDate, setActiveDate] = useState(new Date().getDate());
-    // const activeFliter = useSelector((state) => state.ordersSetting.activeFilters);
+  // const activeFliter = useSelector((state) => state.ordersSetting.activeFilters);
   const dispatch = useDispatch();
 
   useEffect(() => {
     const today = new Date();
     today.setDate(today.getDate() - 3); // Subtract 3 days from the current date
     const dates = [...Array(7)].map((_, i) => new Date(today.getFullYear(), today.getMonth(), today.getDate() + i));
-    const todayIndex = dates.findIndex(date => date.toDateString() === today.toDateString());
+    const todayIndex = dates.findIndex((date) => date.toDateString() === today.toDateString());
     setDates(dates);
     setTodayIndex(todayIndex);
     setActiveDate(new Date().getDate());
@@ -28,14 +28,13 @@ export default function CalanderStrip() {
     const minDateCreated = formatDate(today);
     today.setDate(activeDate + 1);
     const maxDateCreated = formatDate(today);
-    if (activeDate){
-    dispatch(setActiveFilters([
-      { value: minDateCreated, label: 'min_date_created', active: true },
-      { value: maxDateCreated, label: 'max_date_created', active: true },
-    ]));
-    }else{
-        dispatch(setActiveFilters(activeFliter.filter(filter => filter.label !== 'min_date_created' && filter.label !== 'max_date_created')));
-
+    if (activeDate) {
+      dispatch(setActiveFilters([
+        { value: minDateCreated, label: 'min_date_created', active: true },
+        { value: maxDateCreated, label: 'max_date_created', active: true },
+      ]));
+    } else {
+      dispatch(setActiveFilters(activeFliter.filter((filter) => filter.label !== 'min_date_created' && filter.label !== 'max_date_created')));
     }
   }, [activeDate]);
 
@@ -72,15 +71,26 @@ export default function CalanderStrip() {
   };
 
   return (
-    <Box sx={{ width: '100%', height: '40Px', backgroundColor: '#ffffff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <Box sx={{
+      width: '100%', height: '40Px', backgroundColor: '#ffffff', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+    }}
+    >
       <ArrowBackIosIcon onClick={() => onArrowClick('left')} />
       {dates && dates.map((date, i) => (
-        <Box key={i} sx={{ border: '1px solid #000000', width: '40px', height: '40px', display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '50%', flexDirection: 'column', backgroundColor: date.getDate() === activeDate ? '#000000' : '#ffffff', color: date.getDate() === activeDate ? '#ffffff' : '#000000' }} onClick={() => onDateClick(date)}>
+        <Box
+          key={i}
+          sx={{
+            border: '1px solid #000000', width: '40px', height: '40px', display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '50%', flexDirection: 'column', backgroundColor: date.getDate() === activeDate ? '#000000' : '#ffffff', color: date.getDate() === activeDate ? '#ffffff' : '#000000',
+          }}
+          onClick={() => onDateClick(date)}
+        >
           <text
             style={{
               userSelect: 'none',
             }}
-          >{date.getDate()}</text>
+          >
+            {date.getDate()}
+          </text>
           <text
             style={{
               userSelect: 'none',
@@ -88,7 +98,9 @@ export default function CalanderStrip() {
               fontSize: '10px',
               fontWeight: 'bold',
             }}
-          >{new Intl.DateTimeFormat('en-US', { month: 'short' }).format(date)}</text>
+          >
+            {new Intl.DateTimeFormat('en-US', { month: 'short' }).format(date)}
+          </text>
         </Box>
       ))}
       <ArrowForwardIosIcon onClick={() => onArrowClick('right')} />
