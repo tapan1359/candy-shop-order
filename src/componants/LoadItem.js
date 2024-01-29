@@ -1,3 +1,4 @@
+import { Button } from '@mui/material';
 import React, { useState } from 'react';
 
 function LoadItem({ buttonTitle, fetchDataFunc }) {
@@ -16,9 +17,9 @@ function LoadItem({ buttonTitle, fetchDataFunc }) {
 
   return (
     <div>
-      <button onClick={handleButtonClick} disabled={loading}>
+      <Button onClick={handleButtonClick} disabled={loading}>
         {loading ? 'Loading...' : buttonTitle}
-      </button>
+      </Button>
     </div>
 
   );
