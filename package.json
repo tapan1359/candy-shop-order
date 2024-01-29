@@ -2,7 +2,7 @@
   "name": "the_candy_store_online",
   "version": "0.1.0",
   "private": true,
-  "main": "public/main.js",
+  "main": "public/electron.js",
   "homepage": "./",
   "dependencies": {
     "@emotion/react": "^11.11.1",

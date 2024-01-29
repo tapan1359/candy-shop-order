@@ -16,14 +16,14 @@ const port = 6868; // Port for your proxy server
 
 expressApp.use(cors());
 
-const xAuthToken = 'YourAuthTokenHere'; // Your Auth Token from BigCommerce
-const storeHash = 'YourStoreHashHere'; // Your Store Hash from BigCommerce
+const xAuthToken = process.env.BIGCOMMERCE_ACCESS_TOKEN;
+const storeHash = process.env.BIGCOMMERCE_STORE_HASH;
 
 const bigCommerceProxy = createProxyMiddleware({
   target: 'https://api.bigcommerce.com', // BigCommerce API base URL
   changeOrigin: true,
   pathRewrite: {
-    '^/bigcommerce': '/stores/${storeHash}', // rewrite path
+    '^/bigcommerce': `/stores/${storeHash}`, // rewrite path
   },
   onProxyReq: (proxyReq, req, res) => {
     // Set custom headers for BigCommerce
