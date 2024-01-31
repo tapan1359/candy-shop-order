@@ -16,7 +16,7 @@ const createDefaultLineItem = () => ({
   total: '',
 });
 
-export default function NewOrderLineItems({ products }) {
+export default function NewOrderLineItems({ products, setSelectedProducts }) {
   const [selectedItems, setSelectedItems] = React.useState([]);
   const [blankItems, setBlankItems] = React.useState([]);
   const dispatch = useDispatch();
@@ -28,6 +28,7 @@ export default function NewOrderLineItems({ products }) {
   const addLineItem = (index) => {
     const item = blankItems[index];
     setSelectedItems([...selectedItems, item]);
+    setSelectedProducts([...selectedItems, item]);
     setBlankItems(blankItems.filter((_, i) => i !== index));
   };
 
@@ -42,7 +43,7 @@ export default function NewOrderLineItems({ products }) {
     if (!newValue) {
       item = createDefaultLineItem();
     } else {
-      console.log('newValue', newValue);
+      item.id = newValue.id;
       item.image = newValue.primary_image?.url_standard;
       item.sku = newValue.sku;
       item.name = newValue.name;
@@ -51,15 +52,21 @@ export default function NewOrderLineItems({ products }) {
       item.tax = 0;
       item.total = newValue.price;
     }
-    console.log('item', item);
     setBlankItems([...blankItems.slice(0, index), item, ...blankItems.slice(index + 1)]);
   };
+
+  const calculateTotal = (item) => {
+    const totalWithOutTax = item.price * item.quantity;
+    const tax = (totalWithOutTax * item.tax) / 100;
+    const total = totalWithOutTax + tax;
+    return total.toFixed(2);
+  }
 
   const handleQuantityChange = (event, index) => {
     const { value } = event.target;
     const item = blankItems[index];
     item.quantity = value;
-    item.total = item.price * value;
+    item.total = calculateTotal(item);
     setBlankItems([...blankItems.slice(0, index), item, ...blankItems.slice(index + 1)]);
   };
 
@@ -67,7 +74,7 @@ export default function NewOrderLineItems({ products }) {
     const { value } = event.target;
     const item = blankItems[index];
     item.tax = value;
-    item.total = item.price * item.quantity + value;
+    item.total = calculateTotal(item);
     setBlankItems([...blankItems.slice(0, index), item, ...blankItems.slice(index + 1)]);
   };
 
@@ -136,13 +143,13 @@ export default function NewOrderLineItems({ products }) {
                   />
                 </TableCell>
                 <TableCell>
-                  <TextField name="price" value={item.price} onChange={(event) => handleChange(event, index)} />
+                  <TextField name="price" type="number" value={item.price} onChange={(event) => handleChange(event, index)} />
                 </TableCell>
                 <TableCell>
-                  <TextField name="quantity" value={item.quantity} onChange={(event) => handleQuantityChange(event, index)} />
+                  <TextField name="quantity" type="number" value={item.quantity} onChange={(event) => handleQuantityChange(event, index)} />
                 </TableCell>
                 <TableCell>
-                  <TextField name="tax" value={item.tax} onChange={(event) => handleTaxChange(event, index)} />
+                  <TextField name="tax" type="number" value={item.tax} onChange={(event) => handleTaxChange(event, index)} />
                 </TableCell>
                 <TableCell>{item.total}</TableCell>
                 <TableCell>

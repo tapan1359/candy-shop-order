@@ -16,12 +16,13 @@ export default function NewOrderIndex() {
   const products = useSelector((state) => state.data.products);
 
   const cart = useSelector((state) => state.newOrders.cart);
-  const [customer_message, setCustomerMessage] = React.useState('');
   const [loading, setLoading] = React.useState(false);
-
+  const [error, setError] = React.useState(null);
+  const [customer_message, setCustomerMessage] = React.useState('');
   const [customer, setCustomer] = React.useState();
   const [billing, setBilling] = React.useState();
   const [shipping, setShipping] = React.useState();
+  const [selectedProducts, setSelectedProducts] = React.useState([]);
 
   useEffect(() => {
     console.log('customer_message', customer_message);
@@ -31,31 +32,34 @@ export default function NewOrderIndex() {
     setCustomerMessage(e.target.value);
   };
 
+  const disabledSubmit = () => {
+    return loading || !customer || !billing || !shipping || selectedProducts.length === 0;
+  }
+
+
   const handleSubmit = async () => {
-    console.log('customer', customer);
-    console.log('billing', billing);
-    console.log('shipping', shipping);
-    // try {
-    //   setLoading(true);
-    //   setError(null);
-    //   await new Promise((resolve, reject) => { setTimeout(resolve, 2000); });
-    //   const order = await newOrder({ shippingInfo, cartInfo: cart, giftMessage: customer_message });
-    //   console.log('order', order);
-    //   if (order.error) {
-    //     setError(order.error);
-    //     setLoading(false);
-    //     console.log('error creating order', order.error);
-    //   }
-    // } catch (error) {
-    //   setError(error);
-    //   setLoading(false);
-    //   console.log('error creating order', error);
-    // } finally {
-    //   setLoading(false);
-    // }
-  };
+    try {
+      setLoading(true);
+      setError(null);
+      await new Promise((resolve, reject) => { setTimeout(resolve, 2000); });
+      const order = await newOrder({
+        customerId: customer.id, 
+        billling: billing, 
+        shipping: shipping, 
+        products: selectedProducts, 
+        customerMessage: customer_message,
+      });
+      } catch (error) {     
+        setError(JSON.stringify(error));
+        setLoading(false);
+        console.log('error creating order', error);
+      } finally {
+        setLoading(false);
+      }
+    };
   return (
     <div>
+      {error && <Alert severity="error" onClose={() => setError(null)}>{error}</Alert>}
       <Grid container spacing={3} direction="row" marginBottom={10} width={"90%"}>
         <Grid item xs={12}>
           <SelectCustomer customers={customers} setCustomer={setCustomer} />
@@ -67,7 +71,7 @@ export default function NewOrderIndex() {
           <NewOrderShippingForm addresses={customer?.addresses} setShipping={setShipping} />
         </Grid>
         <Grid item xs={12}>
-          <NewOrderLineItems products={products} />
+          <NewOrderLineItems products={products} setSelectedProducts={setSelectedProducts} />
         </Grid>
         <Grid item xs={12}>
           <TextField label="Gift Message" fullWidth multiline rows={4} value={customer_message} onChange={handleCustomerMessageChange} />
