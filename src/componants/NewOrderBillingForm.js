@@ -18,33 +18,45 @@ const billingInfoEmpty = {
   phone: '',
 };
 
-export default function NewOrderBillingForm({ customers, setCustomer }) {
+export default function NewOrderBillingForm({ addresses, setBilling }) {
   const dispatch = useDispatch();
-  const [billing, setBilling] = useState(billingInfoEmpty);
+  const [localBilling, setLocalBilling] = useState(billingInfoEmpty);
 
-  useEffect(() => {
-    console.log('billingInfo', billing);
-  }, [billing]);
-
-  const handleBillingIdChange = async (customer) => {
-    if (customer) {
-      console.log('cus', customer);
-      const address = customer.addresses[0];
-      console.log('aadd', address);
-      setBilling({
-        first_name: customer.first_name,
-        last_name: customer.last_name,
+  const handleSelectBilling = async (address) => {
+    if (address) {
+      setLocalBilling({
+        first_name: address.first_name,
+        last_name: address.last_name,
         address1: address.address1,
         address2: address.address2,
         city: address.city,
         state: address.state_or_province,
         zip: address.postal_code,
         country: address.country,
-        phone: customer.phone,
+        phone: address.phone,
       });
-      setCustomer(customer);
+      setBilling({
+        first_name: address.first_name,
+        last_name: address.last_name,
+        address1: address.address1,
+        address2: address.address2,
+        city: address.city,
+        state: address.state_or_province,
+        zip: address.postal_code,
+        country: address.country,
+        phone: address.phone,
+      });
+    } else {
+      setLocalBilling(billingInfoEmpty);
+      setBilling(billingInfoEmpty);
     }
-  };
+  }
+
+  const handleUpdateField = (e) => {
+    setLocalBilling({ ...localBilling, [e.target.name]: e.target.value });
+    setBilling({ ...localBilling, [e.target.name]: e.target.value });
+  }
+
 
   return (
     <Grid container spacing={2} margin={2}>
@@ -53,13 +65,12 @@ export default function NewOrderBillingForm({ customers, setCustomer }) {
       </Grid>
       <Grid item xs={12}>
         <Autocomplete
+          disabled={!addresses}
           id="combo-box-demo"
-          options={customers}
-          getOptionLabel={(option) => `${option.first_name}${option.last_name}`}
-            // sx={{ width: 300 }}
-          renderInput={(params) => <TextField {...params} label="Search by customer Name/Phone Number" />}
-          onChange={(event, newValue) => handleBillingIdChange(newValue)}
-          filterOptions={(options, state) => options.filter((option) => option.first_name.toLowerCase().includes(state.inputValue.toLowerCase()) || option.last_name.toLowerCase().includes(state.inputValue.toLowerCase()) || option.phone.toLowerCase().includes(state.inputValue.toLowerCase()) || option.email.toLowerCase().includes(state.inputValue.toLowerCase()))}
+          options={addresses?.length > 0 ? addresses : []}
+          getOptionLabel={(option) => `${option.first_name}, ${option.last_name}`}
+          renderInput={(params) => <TextField {...params} label="Select an Address" />}
+          onChange={(event, newValue) => handleSelectBilling(newValue)}
         />
       </Grid>
       <Grid item xs={12} md={6}>
@@ -70,7 +81,8 @@ export default function NewOrderBillingForm({ customers, setCustomer }) {
           label="First name"
           fullWidth
           autoComplete="given-name"
-          value={billing.first_name}
+          value={localBilling.first_name}
+          onChange={handleUpdateField}
         />
       </Grid>
       <Grid item xs={12} md={6}>
@@ -81,7 +93,8 @@ export default function NewOrderBillingForm({ customers, setCustomer }) {
           label="Last name"
           fullWidth
           autoComplete="family-name"
-          value={billing.last_name}
+          value={localBilling.last_name}
+          onChange={handleUpdateField}
         />
       </Grid>
       <Grid item xs={12}>
@@ -92,7 +105,8 @@ export default function NewOrderBillingForm({ customers, setCustomer }) {
           label="Address line 1"
           fullWidth
           autoComplete="shipping address-line1"
-          value={billing.address1}
+          value={localBilling.address1}
+          onChange={handleUpdateField}
         />
       </Grid>
       <Grid item xs={6}>
@@ -102,7 +116,8 @@ export default function NewOrderBillingForm({ customers, setCustomer }) {
           label="Address line 2"
           fullWidth
           autoComplete="shipping address-line2"
-          value={billing.address2}
+          value={localBilling.address2}
+          onChange={handleUpdateField}
         />
       </Grid>
       <Grid item xs={12} sm={6}>
@@ -113,7 +128,8 @@ export default function NewOrderBillingForm({ customers, setCustomer }) {
           label="City"
           fullWidth
           autoComplete="shipping address-level2"
-          value={billing.city}
+          value={localBilling.city}
+          onChange={handleUpdateField}
         />
       </Grid>
       <Grid item xs={12} sm={6}>
@@ -122,7 +138,8 @@ export default function NewOrderBillingForm({ customers, setCustomer }) {
           name="state"
           label="State/Province/Region"
           fullWidth
-          value={billing.state}
+          value={localBilling.state}
+          onChange={handleUpdateField}
         />
       </Grid>
       <Grid item xs={12} sm={6}>
@@ -133,7 +150,8 @@ export default function NewOrderBillingForm({ customers, setCustomer }) {
           label="Zip / Postal code"
           fullWidth
           autoComplete="shipping postal-code"
-          value={billing.zip}
+          value={localBilling.zip}
+          onChange={handleUpdateField}
         />
       </Grid>
       <Grid item xs={12} sm={6}>
@@ -144,7 +162,8 @@ export default function NewOrderBillingForm({ customers, setCustomer }) {
           label="country"
           fullWidth
           autoComplete="shipping country"
-          value={billing.country}
+          value={localBilling.country}
+          onChange={handleUpdateField}
         />
       </Grid>
       <Grid item xs={12} sm={6}>
@@ -155,7 +174,8 @@ export default function NewOrderBillingForm({ customers, setCustomer }) {
           label="Phone Number"
           fullWidth
           autoComplete="shipping phone"
-          value={billing.phone}
+          value={localBilling.phone}
+          onChange={handleUpdateField}
         />
       </Grid>
     </Grid>

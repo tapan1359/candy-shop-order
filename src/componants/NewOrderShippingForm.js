@@ -20,12 +20,28 @@ const shippingInfoEmpty = {
   phone: '',
 };
 
-export default function NewOrderShippingForm({ addresses }) {
+export default function NewOrderShippingForm({ addresses, setShipping }) {
   const dispatch = useDispatch();
-  const [shipping, setShipping] = useState(shippingInfoEmpty);
+  const [localShipping, setLocalShipping] = useState(shippingInfoEmpty);
 
-  const handleShippingInfoChange = async (address) => {
+  const handleUpdateField = (e) => {
+    setLocalShipping({ ...localShipping, [e.target.name]: e.target.value });
+    setShipping({ ...localShipping, [e.target.name]: e.target.value });
+  }
+
+  const handleSelectShipping = async (address) => {
     if (address) {
+      setLocalShipping({
+        first_name: address.first_name,
+        last_name: address.last_name,
+        address1: address.address1,
+        address2: address.address2,
+        city: address.city,
+        state: address.state_or_province,
+        zip: address.postal_code,
+        country: address.country,
+        phone: address.phone,
+      });
       setShipping({
         first_name: address.first_name,
         last_name: address.last_name,
@@ -37,12 +53,14 @@ export default function NewOrderShippingForm({ addresses }) {
         country: address.country,
         phone: address.phone,
       });
+    } else {
+      setLocalShipping(shippingInfoEmpty);
+      setShipping(shippingInfoEmpty);
     }
   };
 
   return (
     <Grid container spacing={2} margin={2}>
-      {/* Shipping Form Label */}
       <Grid item xs={12}>
         <Typography variant="h6">Shipping Address</Typography>
       </Grid>
@@ -50,10 +68,10 @@ export default function NewOrderShippingForm({ addresses }) {
         <Autocomplete
           disabled={!addresses}
           id="combo-box-demo"
-          options={addresses}
-          getOptionLabel={(option) => `${option.first_name}${option.last_name}`}
-          renderInput={(params) => <TextField {...params} label="Select a Address" />}
-          onChange={(event, newValue) => handleShippingInfoChange(newValue)}
+          options={addresses?.length > 0 ? addresses : []}
+          getOptionLabel={(option) => `${option.first_name}, ${option.last_name}`}
+          renderInput={(params) => <TextField {...params} label="Select an Address" />}
+          onChange={(event, newValue) => handleSelectShipping(newValue)}
         />
       </Grid>
       <Grid item xs={12} md={6}>
@@ -64,7 +82,8 @@ export default function NewOrderShippingForm({ addresses }) {
           label="First name"
           fullWidth
           autoComplete="given-name"
-          value={shipping.first_name}
+          value={localShipping.first_name}
+          onChange={handleUpdateField}
         />
       </Grid>
       <Grid item xs={12} md={6}>
@@ -75,7 +94,8 @@ export default function NewOrderShippingForm({ addresses }) {
           label="Last name"
           fullWidth
           autoComplete="family-name"
-          value={shipping.last_name}
+          value={localShipping.last_name}
+          onChange={handleUpdateField}
         />
       </Grid>
       <Grid item xs={12}>
@@ -86,7 +106,8 @@ export default function NewOrderShippingForm({ addresses }) {
           label="Address line 1"
           fullWidth
           autoComplete="shipping address-line1"
-          value={shipping.address1}
+          value={localShipping.address1}
+          onChange={handleUpdateField}
         />
       </Grid>
       <Grid item xs={6}>
@@ -96,7 +117,8 @@ export default function NewOrderShippingForm({ addresses }) {
           label="Address line 2"
           fullWidth
           autoComplete="shipping address-line2"
-          value={shipping.address2}
+          value={localShipping.address2}
+          onChange={handleUpdateField}
         />
       </Grid>
       <Grid item xs={12} sm={6}>
@@ -107,7 +129,8 @@ export default function NewOrderShippingForm({ addresses }) {
           label="City"
           fullWidth
           autoComplete="shipping address-level2"
-          value={shipping.city}
+          value={localShipping.city}
+          onChange={handleUpdateField}
         />
       </Grid>
       <Grid item xs={12} sm={6}>
@@ -116,7 +139,8 @@ export default function NewOrderShippingForm({ addresses }) {
           name="state"
           label="State/Province/Region"
           fullWidth
-          value={shipping.state}
+          value={localShipping.state}
+          onChange={handleUpdateField}
         />
       </Grid>
       <Grid item xs={12} sm={6}>
@@ -127,7 +151,8 @@ export default function NewOrderShippingForm({ addresses }) {
           label="Zip / Postal code"
           fullWidth
           autoComplete="shipping postal-code"
-          value={shipping.zip}
+          value={localShipping.zip}
+          onChange={handleUpdateField}
         />
       </Grid>
       <Grid item xs={12} sm={6}>
@@ -138,7 +163,8 @@ export default function NewOrderShippingForm({ addresses }) {
           label="country"
           fullWidth
           autoComplete="shipping country"
-          value={shipping.country}
+          value={localShipping.country}
+          onChange={handleUpdateField}
         />
       </Grid>
       <Grid item xs={12} sm={6}>
@@ -149,7 +175,8 @@ export default function NewOrderShippingForm({ addresses }) {
           label="Phone Number"
           fullWidth
           autoComplete="shipping phone"
-          value={shipping.phone}
+          value={localShipping.phone}
+          onChange={handleUpdateField}
         />
       </Grid>
     </Grid>
