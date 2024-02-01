@@ -3,12 +3,16 @@ const pdfPrinter = require('pdf-to-printer');
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
+const createDoc = require('./createDoc');
+const os = require('os');
+const unixPrint = require('unix-print');
 
 const setUpPrint = (mainWindow) => {
   ipcMain.on('get-printers', async (event) => {
+    console.log('win', typeof mainWindow);
     try {
-      const printers = await mainWindow.webContents.getPrinters();
-      // console.log("printers", printers);
+      const printers = await mainWindow.webContents.getPrintersAsync();
+      console.log("printers", printers);
       event.reply('printers-list', printers); // Sending the printers list to the renderer
     } catch (error) {
       console.error('Error fetching printers:', error);
@@ -17,17 +21,16 @@ const setUpPrint = (mainWindow) => {
   });
 
   ipcMain.on('print', async (event, arg) => {
+    const filepath = await createDoc(arg.text);
     try {
-      console.log('print', arg);
-      const __dirname = path.dirname(__filename); // Use this to get the current directory
-      console.log('__dirname', __dirname);
-      pdfPrinter.print(arg.route, {
-        printer: arg.printerName,
-        pageSize: {
-          height: arg.height,
-          width: arg.width,
-        },
-      });
+      console.log('args', arg);
+      if (os.platform() === 'win32') {
+        pdfPrinter.print(filepath, {
+          printer: arg.printerName
+        });
+      } else {
+        unixPrint.print(filepath, arg.printerName);
+      }
     } catch (error) {
       console.log('error in print', error);
       event.reply('print-error', error);

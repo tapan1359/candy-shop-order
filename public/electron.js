@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const isDev = require('electron-is-dev');
 const axios = require('axios');
 const cors = require('cors'); // Import the cors middleware
+const setUpPrint = require('../electron/printer');
 
 require('dotenv').config();
 // import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
@@ -122,6 +123,10 @@ function createWindow() {
       // console.log('Error in newOrder:', error.message);
       event.reply('newOrderError', error.message);
     }
+  });
+
+  win.webContents.on('did-finish-load', () => {
+    setUpPrint(win);
   });
 }
 

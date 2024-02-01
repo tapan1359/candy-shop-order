@@ -1,9 +1,9 @@
-import PDFKit from 'pdfkit';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
-import path from 'path';
+const PDFKit = require('pdfkit');
+const fs = require('fs');
+const { fileURLToPath } = require('url');
+const path = require('path');
 
-export async function createDoc(text) {
+async function createDoc(text) {
   // var lineNum = text.split(/\r\n|\r|\n/).length;
   const lines = text.split('\n');
   const nonEmptyLines = lines.filter((line) => line.trim() !== '');
@@ -67,7 +67,7 @@ export async function createDoc(text) {
   });
 
   // create a file and return the path
-  const tempFolder = fileURLToPath(import.meta.url);
+  const tempFolder = path.dirname(__filename);
   const tempPdfDir = path.join(tempFolder, 'pdfTemp'); // Path to the pdfTemp directory
   // Check if the pdfTemp directory exists, create if not
   if (!fs.existsSync(tempPdfDir)) {
@@ -80,3 +80,5 @@ export async function createDoc(text) {
 
   return filePath;
 }
+
+module.exports = createDoc;
