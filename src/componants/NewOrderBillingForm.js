@@ -19,7 +19,6 @@ const billingInfoEmpty = {
 };
 
 export default function NewOrderBillingForm({ addresses, setBilling }) {
-  const dispatch = useDispatch();
   const [localBilling, setLocalBilling] = useState(billingInfoEmpty);
 
   const handleSelectBilling = async (address) => {
@@ -59,7 +58,7 @@ export default function NewOrderBillingForm({ addresses, setBilling }) {
 
 
   return (
-    <Grid container spacing={2} margin={2}>
+    <Grid container spacing={2}>
       <Grid item xs={12}>
         <Typography variant="h6">Biiling Address</Typography>
       </Grid>

@@ -10,6 +10,9 @@ export default function SelectCustomer({customers, setCustomer}) {
 
   return (
     <Autocomplete
+      sx={{
+        width: 500,
+      }}
       id="combo-box-demo"
       options={customers}
       getOptionLabel={(option) => `${option.first_name}, ${option.last_name}`}

@@ -12,7 +12,7 @@ const createDefaultLineItem = () => ({
   name: '',
   price: '',
   quantity: '',
-  tax: '',
+  tax: 6,
   total: '',
 });
 
