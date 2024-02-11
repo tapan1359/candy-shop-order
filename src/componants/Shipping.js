@@ -86,14 +86,20 @@ export default function Shipping({addresses, products, consignment, removeConsig
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         boxShadow: 2,
         borderRadius: '8px',
         p: 4,
         gap: 4,
       }}
     >
-      <AddressForm title={"Shipping"} addresses={addresses} setAddress={setShippingAddress} />
+      <Box
+        sx={{
+          flexGrow: 2,
+        }}
+      >
+        <AddressForm title={"Shipping"} addresses={addresses} setAddress={setShippingAddress} />
+      </Box>
       <Divider orientation={"vertical"} flexItem />
       <Box
         sx={{
@@ -101,6 +107,7 @@ export default function Shipping({addresses, products, consignment, removeConsig
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
+          gap: 2,
         }}
       >
         <Typography variant={"h6"}>Products</Typography>
@@ -162,7 +169,8 @@ export default function Shipping({addresses, products, consignment, removeConsig
             top: '50%',
             left: '50%',
             width: 400,
-            transform: 'translate(50%, 50%)',
+            transform: 'translate(80%, 50%)',
+            gap: 2
           }}
         >
           <Autocomplete
@@ -175,12 +183,38 @@ export default function Shipping({addresses, products, consignment, removeConsig
             onChange={(event, newValue) => handleSelectModelItem(newValue)}
             filterOptions={(options, state) => options.filter((option) => option.name.toLowerCase().includes(state.inputValue.toLowerCase()))}
           />
-          <TextField name="sku" value={modelItem.sku} />
-          <TextField name="price" type="number" value={modelItem.price} onChange={handleUpdateField} />
-          <TextField name="quantity" type="number" value={modelItem.quantity} onChange={handleUpdateField} />
-          <TextField name="tax" type="number" value={modelItem.tax} onChange={handleUpdateField} />
+          <TextField
+            sx={{ width: 300 }}
+            name="sku"
+            value={modelItem.sku}
+            label={"SKU"}
+          />
+          <TextField
+            sx={{ width: 300 }}
+            name="price" type="number"
+            value={modelItem.price}
+            label={"Price"}
+            onChange={handleUpdateField}
+          />
+          <TextField
+            sx={{ width: 300 }}
+            name="quantity"
+            type="number"
+            value={modelItem.quantity}
+            label={"Quantity"}
+            onChange={handleUpdateField}
+          />
+          <TextField
+            sx={{ width: 300 }}
+            name="tax"
+            type="number"
+            value={modelItem.tax}
+            label={"Tax"}
+            onChange={handleUpdateField}
+          />
           <Typography
             variant="h6"
+            sx={{ width: 300 }}
           >{modelItem.total}</Typography>
           <Button
             onClick={handleModalAddItem}
@@ -194,7 +228,10 @@ export default function Shipping({addresses, products, consignment, removeConsig
       <Button
         onClick={() => removeConsignment(consignment.internalId)}
         size={"small"}
-        variant={"outlined"}
+        color={"error"}
+        sx={{
+          fontSize: 10,
+        }}
       >
         Remove Consignment
       </Button>

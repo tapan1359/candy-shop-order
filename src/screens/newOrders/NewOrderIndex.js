@@ -23,7 +23,13 @@ import SelectCustomer from '../../componants/SelectCustomer';
 import AddressFormOld from "../../componants/AddressFormOld";
 import Shipping from "../../componants/Shipping";
 import AddressForm from "../../componants/AddressForm";
-import {addCheckoutBillingAddress, createCart, createShippingConsignments} from "../../bigCommerce/orders/orders";
+import {
+  addCheckoutBillingAddress,
+  addShippingOption,
+  createCart, createOrder,
+  createShippingConsignments
+} from "../../bigCommerce/orders/orders";
+import {ShippingOptions} from "../../componants/ShippingOptions";
 
 
 const createDefaultConsignment = (id) => {
@@ -34,33 +40,32 @@ const createDefaultConsignment = (id) => {
   }
 }
 
+let consignmentInteralId = 0
 
 export default function NewOrderIndex() {
 
-  let consignmentInteralId = 0
-
   const customers = useSelector((state) => state.data.customers);
   const products = useSelector((state) => state.data.products);
-
-  const cart = useSelector((state) => state.newOrders.cart);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
-  const [customer_message, setCustomerMessage] = React.useState('');
-  const [customer, setCustomer] = React.useState();
-  const [billing, setBilling] = React.useState();
-  const [shipping, setShipping] = React.useState();
-  const [selectedProducts, setSelectedProducts] = React.useState([]);
+  const [customer, setCustomer] = React.useState(null);
+  const [billing, setBilling] = React.useState(null);
   const [consignments, setConsignments] = React.useState([]);
+  const [APIConsignments, setAPIConsignments] = React.useState([]);
+  const [consignmentToShippingMapping, setConsignmentToShippingMapping] = React.useState({});
+  const [checkoutId, setCheckoutId] = React.useState(null);
 
-  useEffect(() => {
-    console.log('customer_message', customer_message);
-  }, [customer_message]);
 
 
-  const disabledSubmit = () => {
-    return loading || !customer || !billing || !shipping || selectedProducts.length === 0;
+  const resetPage = () => {
+    setError(null);
+    setCustomer(null);
+    setBilling(null);
+    setConsignments([]);
+    setAPIConsignments([]);
+    setConsignmentToShippingMapping({});
+    setCheckoutId(null);
   }
-
 
   const addConsignment = () => {
     setConsignments([...consignments, createDefaultConsignment(consignmentInteralId)]);
@@ -78,8 +83,6 @@ export default function NewOrderIndex() {
 
   const handleSubmit = async () => {
 
-    console.log(consignments)
-
     try {
       setLoading(true);
       setError(null);
@@ -89,10 +92,10 @@ export default function NewOrderIndex() {
         customerId: customer.id,
         lineItems: consignments.flatMap((consignment) => consignment.lineItems)
       });
-
+      console.log("cart", cart)
       const checkoutId = cart.data.id;
 
-      await addCheckoutBillingAddress({checkoutId, billing});
+      await addCheckoutBillingAddress({checkoutId, billingAddress: billing});
 
       // Create Consignments
       const consignmentResponse = await createShippingConsignments({
@@ -102,9 +105,12 @@ export default function NewOrderIndex() {
       });
 
       // consignmentResponse.data.consignments.
+      setAPIConsignments(consignmentResponse.data.consignments);
+
+      setCheckoutId(checkoutId);
 
     } catch (error) {
-
+      console.log('error creating order', error);
       const data = error.response.data;
       setError(JSON.stringify(data?.title));
       setLoading(false);
@@ -114,7 +120,15 @@ export default function NewOrderIndex() {
     }
   }
 
-  const createOrder = async () => {}
+  const handleCreateOrder = async () => {
+
+    consignmentToShippingMapping.forEach(async (consignmentId, shippingOptionId) => {
+      await addShippingOption({checkoutId, consignmentId, shippingOptionId});
+    });
+
+    await createOrder({checkoutId});
+
+  }
 
   return (
     <>
@@ -123,25 +137,31 @@ export default function NewOrderIndex() {
         sx={{
           display: 'flex',
           flexDirection: 'column',
-          height: '100vh'
+          height: '100vh',
+          paddingTop: 2,
+          gap: 2,
         }}
       >
-        <SelectCustomer customers={customers} setCustomer={setCustomer} />
-        <AddressForm title={"Billing"} addresses={customer?.addresses} setAddress={setBilling} />
-        <FormControl>
-          <FormLabel id="demo-controlled-radio-buttons-group">Fulfillment Method</FormLabel>
-          <RadioGroup
-            row
-            aria-labelledby="demo-controlled-radio-buttons-group"
-            name="controlled-radio-buttons-group"
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-around',
+          }}
+        >
+          <SelectCustomer customers={customers} setCustomer={setCustomer} />
+          <Button
+            color={'error'}
+            onClick={resetPage}
           >
-            <FormControlLabel value="shipping" control={<Radio />} label="Shipping" />
-            <FormControlLabel value="pickup" control={<Radio />} label="Pickup" />
-          </RadioGroup>
-        </FormControl>
+            RESET
+          </Button>
+        </Box>
+        <Divider />
+        <AddressForm title={"Billing Address"} addresses={customer?.addresses} setAddress={setBilling} />
+        <Divider />
 
         <Typography variant="h6">Consignments</Typography>
-        <Divider />
         {consignments.map((consignment) => (
           <Box
             key={consignment.internalId}
@@ -167,9 +187,10 @@ export default function NewOrderIndex() {
         >
           Create Cart and Get Shipping Options
         </Button>
+        <ShippingOptions APIConsignments={APIConsignments} setConsignmentIdToShippingMapping={setConsignmentToShippingMapping} />
         <Button
           size={"large"}
-          onClick={createOrder}
+          onClick={handleCreateOrder}
           sx={{
             backgroundColor: 'green',
             color: 'white'

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {TextField, Autocomplete} from '@mui/material';
 
 
@@ -10,9 +10,7 @@ export default function SelectCustomer({customers, setCustomer}) {
 
   return (
     <Autocomplete
-      sx={{
-        width: 500,
-      }}
+      fullWidth
       id="combo-box-demo"
       options={customers}
       getOptionLabel={(option) => `${option.first_name}, ${option.last_name}`}

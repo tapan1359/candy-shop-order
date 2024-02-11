@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Box, TextField, Typography, FormControl, Autocomplete, Button, Modal,
+  Box, TextField, Typography, FormControl, Autocomplete, Button, Modal, Divider,
 } from '@mui/material';
 
 const billingInfoEmpty = {
@@ -10,8 +10,9 @@ const billingInfoEmpty = {
   address2: '',
   city: '',
   state: '',
-  zip: '',
+  postal_code: '',
   country: '',
+  country_code: '',
   phone: '',
   giftMessage: '',
 };
@@ -33,8 +34,9 @@ export default function AddressForm({ title, addresses, setAddress }) {
         address2: address.address2,
         city: address.city,
         state: address.state_or_province,
-        zip: address.postal_code,
+        postal_code: address.postal_code,
         country: address.country,
+        country_code: address.country_code,
         phone: address.phone,
         giftMessage: address.giftMessage,
       });
@@ -45,8 +47,9 @@ export default function AddressForm({ title, addresses, setAddress }) {
         address2: address.address2,
         city: address.city,
         state: address.state_or_province,
-        zip: address.postal_code,
+        postal_code: address.postal_code,
         country: address.country,
+        country_code: address.country_code,
         phone: address.phone,
         giftMessage: address.giftMessage,
       });
@@ -66,10 +69,13 @@ export default function AddressForm({ title, addresses, setAddress }) {
     <Box
       component="form"
       sx={{
-        width: 500,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 2,
       }}
     >
-        <Typography variant="h6">{title}</Typography>
+        <Typography variant="subtitle1">{title}</Typography>
 
         <Autocomplete
           disabled={!addresses}
@@ -85,16 +91,17 @@ export default function AddressForm({ title, addresses, setAddress }) {
           )}
           renderInput={(params) => <TextField {...params} label="Select an Address"/>}
           onChange={(event, newValue) => handleSelectBilling(newValue)}
-          fullWidth
           margin="normal"
           size={"small"}
+          sx={{
+            width: 500,
+          }}
         />
-
-        <Typography variant="h6">Selected Address</Typography>
+        <Typography variant="subtitle1">Selected Address:</Typography>
         {localBilling.first_name !== '' && (
           <Box>
-            <Typography variant="subtitle1">{`${localBilling.first_name}, ${localBilling.last_name}`}</Typography>
-            <Typography variant="subtitle2">{`${localBilling.address1}, ${localBilling.city}, ${localBilling.state}, ${localBilling.zip}, ${localBilling.country}`}</Typography>
+            <Typography variant="subtitle2">{`${localBilling.first_name}, ${localBilling.last_name}`}</Typography>
+            <Typography variant="subtitle2">{`${localBilling.address1}, ${localBilling.city}, ${localBilling.state}, ${localBilling.postal_code}, ${localBilling.country}`}</Typography>
             <Typography variant="subtitle2">{`${localBilling.phone}`}</Typography>
           </Box>
         )}
@@ -119,7 +126,7 @@ export default function AddressForm({ title, addresses, setAddress }) {
             top: '50%',
             left: '50%',
             width: 400,
-            transform: 'translate(50%, 50%)',
+            transform: 'translate(80%, 30%)',
           }}
         >
           <FormControl fullWidth margin="normal">
@@ -222,11 +229,11 @@ export default function AddressForm({ title, addresses, setAddress }) {
               <TextField
                 size={"small"}
                 required
-                id="zip"
-                name="zip"
+                id="postal_code"
+                name="postal_code"
                 label="Zip / Postal code"
                 fullWidth
-                value={localBilling.zip}
+                value={localBilling.postal_code}
                 onChange={handleUpdateField}
                 margin="normal"
                 size={"small"}

@@ -12,6 +12,7 @@ const convertToCartAPILineItems = (lineItems) => {
 }
 
 const createBillingForAPI = (billing) => {
+  console.log('billing', billing)
   if (billing.giftMessage) {
     billing["custom_fields"] = [
       {
@@ -58,11 +59,11 @@ export const createShippingConsignments = async ({checkoutId, consignments, cart
     }
   });
 
-
   const response = await api_bigCommerce.post(
     `/v3/checkouts/${checkoutId}/consignments?include=consignments.available_shipping_options`,
     consignmentAddressForApi
   );
+
   return response.data;
 }
 
