@@ -103,11 +103,13 @@ export default function AddressForm({ title, addresses, setAddress }) {
             <Typography variant="subtitle2">{`${localBilling.first_name}, ${localBilling.last_name}`}</Typography>
             <Typography variant="subtitle2">{`${localBilling.address1}, ${localBilling.city}, ${localBilling.state}, ${localBilling.postal_code}, ${localBilling.country}`}</Typography>
             <Typography variant="subtitle2">{`${localBilling.phone}`}</Typography>
+            <Typography variant="subtitle2">{`Gift Message: ${localBilling.giftMessage}`}</Typography>
           </Box>
         )}
 
         <Button
           onClick={() => setModalOpen(true)}
+          disabled={localBilling === billingInfoEmpty}
           size={"small"}
           variant={"outlined"}
         >Update</Button>

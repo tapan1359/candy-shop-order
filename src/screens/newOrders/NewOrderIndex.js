@@ -76,9 +76,11 @@ export default function NewOrderIndex() {
     setConsignments(consignments.filter((consignment) => consignment.internalId !== internalId));
   }
 
-  useEffect(() => {
-    console.log('consignments', consignments);
-  }, [consignments]);
+  const disableCreateCart = () => {
+    if (!customer || !billing || consignments.length === 0) {
+      return true;
+    }
+  }
 
 
   const handleSubmit = async () => {
@@ -122,11 +124,23 @@ export default function NewOrderIndex() {
 
   const handleCreateOrder = async () => {
 
-    consignmentToShippingMapping.forEach(async (consignmentId, shippingOptionId) => {
-      await addShippingOption({checkoutId, consignmentId, shippingOptionId});
-    });
+    try {
+      setLoading(true);
+      setError(null);
+      consignmentToShippingMapping.forEach(async (consignmentId, shippingOptionId) => {
+        await addShippingOption({checkoutId, consignmentId, shippingOptionId});
+      });
 
-    await createOrder({checkoutId});
+      await createOrder({checkoutId});
+    } catch (error) {
+      console.log('error creating order', error);
+      const data = error.response.data;
+      setError(JSON.stringify(data?.title));
+      setLoading(false);
+    }
+    finally {
+      setLoading(false);
+    }
 
   }
 
@@ -184,8 +198,9 @@ export default function NewOrderIndex() {
         <Button
           size={"large"}
           onClick={handleSubmit}
+          disabled={disableCreateCart()}
         >
-          Create Cart and Get Shipping Options
+          {loading ? "Loading..." : "Create Cart and Get Shipping Options"}
         </Button>
         <ShippingOptions APIConsignments={APIConsignments} setConsignmentIdToShippingMapping={setConsignmentToShippingMapping} />
         <Button
@@ -196,7 +211,7 @@ export default function NewOrderIndex() {
             color: 'white'
           }}
         >
-          Create Order
+          {loading ? "Loading..." : "Create Order"}
         </Button>
       </Box>
 

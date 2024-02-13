@@ -64,6 +64,7 @@ export default function Shipping({addresses, products, consignment, removeConsig
     setSelectedProducts([...selectedProducts, modelItem]);
     consignment.lineItems = [...consignment.lineItems, modelItem];
     setModalOpen(false);
+    setModelItem(createDefaultLineItem());
   }
 
   const removeLineItem = (index) => {
