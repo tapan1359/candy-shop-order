@@ -5,14 +5,28 @@ import OrderLineItem from './OrderLineItem';
 import { getOrderStatus } from '../../bigCommerce/orders/orders.get';
 import { setOrderStatuses } from '../../redux/bigCommerce/ordersSlice';
 import { getPrinters, printPDF } from '../../print';
-import { Autocomplete, TextField, Grid } from '@mui/material';
-
+import {
+  Autocomplete,
+  TextField,
+  Grid,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Button,
+  Accordion, AccordionSummary, AccordionDetails, Box, Typography
+} from '@mui/material';
+import moment from 'moment';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 export default function OrderIndex() {
   const orders = useSelector((state) => state.orders.orders);
   const dispatch = useDispatch();
   const [selectedPrinter, setSelectedPrinter] = useState('');
   const [printers, setPrinters] = useState([]);
+  const [expanded, setExpanded] = useState(null);
 
   useEffect(() => {
     handleGetOrderStatus();
@@ -31,11 +45,18 @@ export default function OrderIndex() {
     setPrinters(printersWithName);
   };
 
+  const getShipping = (order) =>  {
+    const shipping = order.consignments.map((consignment) => {
+      console.log(consignment.shipping);
+      if (consignment?.shipping && consignment.shipping.length > 0) {
+        return consignment.shipping[0];
+      }
+    }).filter((item) => item !== undefined);
+    return shipping;
+  }
 
-  const printOrder = async (order) => {
-    console.log('printing order', order);
-    console.log('selectedPrinter', selectedPrinter);
-    await printPDF(order.customer_message, selectedPrinter, 100, 100);
+  const printOrder = async (text) => {
+    await printPDF(text, selectedPrinter, 100, 100);
   };
 
   return (
@@ -54,11 +75,105 @@ export default function OrderIndex() {
           </div>
         </Grid>
       </Grid>
-      {/* for each order make a nice row displaying info for that order using mui */}
-      {orders && orders.map((order) => (
-        <OrderLineItem order={order} key={order.id} printOrder={printOrder} />
-      ))}
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          paddingLeft: 2,
+        }}
+      >
+        {orders.map((order) => (
+          <Accordion key={order.id} expanded={expanded === order.id} onChange={() => setExpanded(order.id)}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  width: '100%',
+                }}
+              >
+                <TableCell>{order.id}</TableCell>
+                <TableCell>
+                  {order.billing_address.first_name} {order.billing_address.last_name}
+                </TableCell>
+                <TableCell>${order.total_inc_tax}</TableCell>
+                <TableCell>{order.status}</TableCell>
+                <TableCell>{moment(order.date_created).format('MM/DD/YYYY')}</TableCell>
+              </Box>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: 2,
+                  paddingLeft: 2,
+                  justifyContent: 'space-between',
+                }}
+              >
+                {order.customer_message && (
+                  <Box>
+                    <Typography variant={"subtitle1"}>Customer Message</Typography>
+                    <Typography variant={"subtitle2"}>{order.customer_message}</Typography>
+                    <Button
+                      size={"small"}
+                      variant={"outlined"}
+                      onClick={() => printOrder(order.customer_message)}
+                    >
+                      Print</Button>
+                  </Box>
+                )}
+                {order.billing_address && (
+                  <Box>
+                    <Typography variant={"subtitle1"}>Billing Address</Typography>
+                    <Typography variant={"subtitle2"}>{order.billing_address.first_name} {order.billing_address.last_name}</Typography>
+                    <Typography variant={"subtitle2"}>{order.billing_address.street_1}</Typography>
+                    <Typography variant={"subtitle2"}>{order.billing_address.city}, {order.billing_address.state} {order.billing_address.zip}</Typography>
+                    {order.billing_address.form_fields && order.billing_address.form_fields.map((field) => (
+                      field.name === 'Gift Message' && (
+                        <div key={field.name}>
+                          <Typography variant={"subtitle2"}>Gift Message: {field.value}</Typography>
+                          <Button
+                            size={"small"}
+                            variant={"outlined"}
+                            onClick={() => printOrder(field.value)}
+                          >
+                            Print</Button>
+                        </div>
+                      )
+                    ))}
+                  </Box>
+                )}
 
+
+                {getShipping(order)?.map((shipping) => (
+                  <Box key={shipping.id}>
+                    <Typography variant={"subtitle1"}>Shipping Address</Typography>
+                    <Typography variant={"subtitle2"}>{order.billing_address.first_name} {order.billing_address.last_name}</Typography>
+                    <Typography variant={"subtitle2"}>{order.billing_address.street_1}</Typography>
+                    <Typography variant={"subtitle2"}>{order.billing_address.city}, {order.billing_address.state} {order.billing_address.zip}</Typography>
+                    {shipping.form_fields && shipping.form_fields.map((field) => (
+                      field.name === 'Gift Message' && (
+                        <div key={field.name}>
+                          <Typography variant={"subtitle2"}>Gift Message: {field.value}</Typography>
+                          <Button
+                            size={"small"}
+                            variant={"outlined"}
+                            onClick={() => printOrder(field.value)}
+                          >
+                            Print</Button>
+                        </div>
+                      )
+                    ))}
+                  </Box>
+                ))}
+              </Box>
+            </AccordionDetails>
+          </Accordion>
+        ))}
+      </Box>
     </div>
   );
 }

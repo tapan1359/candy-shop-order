@@ -2,20 +2,13 @@
 import { api_bigCommerce } from '../api/api.bigCommerce';
 
 // In your renderer file (e.g., a React component)
-export const getOrders = async ({ params = {}, order_id = '' }) => {
-  console.log('getOrders', params, order_id);
+export const getOrders = async ({ params = {} }) => {
+
+  params = {include: "consignments", ...params}
+
   try {
     // Create the Axios config object
-    const response = await api_bigCommerce({
-      method: 'get',
-      url: `/v2/orders${order_id ? `/${order_id}` : ''}`,
-      params,
-
-    });
-
-    // Send the request to the main process and wait for the response
-    //   response.data.map(order => console.log(order));
-    console.log('getOrders response', response);
+    const response = await api_bigCommerce.get('/v2/orders', {params});
     return response.data;
   } catch (error) {
     console.error('Error in getOrders:', error);

@@ -8,7 +8,7 @@ import { setOrders } from '../redux/bigCommerce/ordersSlice';
 import '../styles/StartEndTimePicker.css';
 
 export default function StartEndTimePicker() {
-  const [startDate, setStartDate] = useState(new Date('2021-10-01')); // this is the start date for the picker
+  const [startDate, setStartDate] = useState(new Date('2024-02-06')); // this is the start date for the picker
   const [endDate, setEndDate] = useState(new Date());
   const orders = useSelector((state) => state.orders.orders);
   const dispatch = useDispatch();
