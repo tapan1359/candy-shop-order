@@ -21,6 +21,7 @@ const createBillingForAPI = (billing) => {
       }
     ]
   }
+  billing.state_or_province = billing.state;
   delete billing.giftMessage;
   return billing;
 }
@@ -34,9 +35,9 @@ export const createCart = async ({customerId, lineItems}) => {
   return response.data;
 }
 
-export const addCheckoutBillingAddress = ({checkoutId, billingAddress}) => {
+export const addCheckoutBillingAddress = async ({checkoutId, billingAddress}) => {
   const billingAddressForApi = createBillingForAPI(billingAddress);
-  const response = api_bigCommerce.post(
+  const response = await api_bigCommerce.post(
     `/v3/checkouts/${checkoutId}/billing-address`,
     billingAddressForApi
   );
@@ -68,12 +69,23 @@ export const createShippingConsignments = async ({checkoutId, consignments, cart
 }
 
 
-export const addShippingOption = async ({checkoutId, consignmentId, shippingOptionId}) => {
-  const response = await api_bigCommerce.post(
-    `/v3/checkouts/${checkoutId}/consignments/${consignmentId}`,
-    { "shipping_option_id": shippingOptionId }
-  );
-  return response.data;
+export const addShippingOptions = async ({checkoutId, consignmentToShippingMapping}) => {
+  console.log("consignmentToShippingMapping", consignmentToShippingMapping)
+  return new Promise((resolve, reject) => {
+    const consignmentIds = Object.keys(consignmentToShippingMapping);
+    const promises = consignmentIds.map((consignmentId) => {
+      return api_bigCommerce.put(
+        `/v3/checkouts/${checkoutId}/consignments/${consignmentId}`,
+        { "shipping_option_id": consignmentToShippingMapping[consignmentId] }
+      );
+    });
+
+    Promise.all(promises).then((values) => {
+      resolve(values);
+    }).catch((error) => {
+      reject(error);
+    });
+  });
 }
 
 export const createOrder = async ({checkoutId}) => {

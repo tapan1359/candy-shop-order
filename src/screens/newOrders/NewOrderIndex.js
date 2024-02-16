@@ -25,7 +25,7 @@ import Shipping from "../../componants/Shipping";
 import AddressForm from "../../componants/AddressForm";
 import {
   addCheckoutBillingAddress,
-  addShippingOption,
+  addShippingOptions,
   createCart, createOrder,
   createShippingConsignments
 } from "../../bigCommerce/orders/orders";
@@ -83,6 +83,10 @@ export default function NewOrderIndex() {
   }
 
 
+  useEffect(() => {
+    console.log("EffectINMAPPINg", consignmentToShippingMapping);
+  }, [consignmentToShippingMapping]);
+
   const handleSubmit = async () => {
 
     try {
@@ -96,8 +100,6 @@ export default function NewOrderIndex() {
       });
       console.log("cart", cart)
       const checkoutId = cart.data.id;
-
-      await addCheckoutBillingAddress({checkoutId, billingAddress: billing});
 
       // Create Consignments
       const consignmentResponse = await createShippingConsignments({
@@ -127,9 +129,10 @@ export default function NewOrderIndex() {
     try {
       setLoading(true);
       setError(null);
-      consignmentToShippingMapping.forEach(async (consignmentId, shippingOptionId) => {
-        await addShippingOption({checkoutId, consignmentId, shippingOptionId});
-      });
+
+      await addCheckoutBillingAddress({checkoutId, billingAddress: billing});
+
+      await addShippingOptions({checkoutId, consignmentToShippingMapping});
 
       await createOrder({checkoutId});
     } catch (error) {
@@ -140,6 +143,7 @@ export default function NewOrderIndex() {
     }
     finally {
       setLoading(false);
+      resetPage();
     }
 
   }

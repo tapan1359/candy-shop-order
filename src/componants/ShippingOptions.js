@@ -4,7 +4,10 @@ import React from "react";
 export const ShippingOptions = ({APIConsignments, setConsignmentIdToShippingMapping}) => {
 
   const handleShippingOptionChange = (consignmentId, shippingOptionId) => {
-    console.log('e.target.value', consignmentId, shippingOptionId);
+    console.log('shippingOptions');
+    console.log('consignmentId', consignmentId);
+    console.log('shippingOptionId', shippingOptionId);
+    setConsignmentIdToShippingMapping({[consignmentId]: shippingOptionId});
   }
 
   return (APIConsignments.length > 0 && (
