@@ -3,24 +3,10 @@ import {
   Alert,
   Box,
   Button, Divider,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  Grid, Paper,
-  Radio,
-  RadioGroup, Table, TableCell,
-  TableContainer, TableHead, TableRow,
-  TextField,
   Typography,
 } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
-import NewOrderBillingForm from '../../componants/NewOrderBillingForm';
-import NewOrderShippingForm from '../../componants/NewOrderShippingForm';
-import NewOrderLineItems from '../../componants/NewOrderLineItems';
-import { setShippingInfo } from '../../redux/bigCommerce/newOrderSlice';
-import { newOrder } from '../../bigCommerce/orders/orders.post';
+import { useSelector } from 'react-redux';
 import SelectCustomer from '../../componants/SelectCustomer';
-import AddressFormOld from "../../componants/AddressFormOld";
 import Shipping from "../../componants/Shipping";
 import AddressForm from "../../componants/AddressForm";
 import {
@@ -82,6 +68,12 @@ export default function NewOrderIndex() {
     }
   }
 
+
+  const disableCreateOrder = () => {
+    if (!checkoutId || !consignmentToShippingMapping) {
+      return true;
+    }
+  }
 
   useEffect(() => {
     console.log("EffectINMAPPINg", consignmentToShippingMapping);
@@ -210,10 +202,7 @@ export default function NewOrderIndex() {
         <Button
           size={"large"}
           onClick={handleCreateOrder}
-          sx={{
-            backgroundColor: 'green',
-            color: 'white'
-          }}
+          disabled={disableCreateOrder()}
         >
           {loading ? "Loading..." : "Create Order"}
         </Button>

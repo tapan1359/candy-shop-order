@@ -13,6 +13,7 @@ import {
   Typography
 } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const DEFAULT_TAX = 6;
 
@@ -91,19 +92,15 @@ export default function Shipping({addresses, products, consignment, removeConsig
       sx={{
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
         alignItems: 'flex-start',
         boxShadow: 2,
         borderRadius: '8px',
-        p: 4,
-        gap: 4,
+        p: 2,
+        gap: 3,
       }}
     >
-      <Box
-        sx={{
-          flexGrow: 2,
-        }}
-      >
+      <Box>
         <AddressForm title={"Shipping"} addresses={addresses} setAddress={setShippingAddress} />
       </Box>
       <Divider orientation={"vertical"} flexItem />
@@ -116,9 +113,18 @@ export default function Shipping({addresses, products, consignment, removeConsig
           gap: 2,
         }}
       >
-        <Typography variant={"h6"}>Products</Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2}}>
+          <Typography variant={"h6"}>Products</Typography>
+          <IconButton
+            onClick={() => removeConsignment(consignment.internalId)}
+            size='small'
+            color='error'
+            >
+              <DeleteIcon />
+            </IconButton>
+        </Box>
         <TableContainer>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <Table aria-label="simple table">
             <TableHead>
               <TableRow>
                 <TableCell>Image</TableCell>
@@ -233,16 +239,7 @@ export default function Shipping({addresses, products, consignment, removeConsig
           </Button>
         </Box>
       </Modal>
-      <Button
-        onClick={() => removeConsignment(consignment.internalId)}
-        size={"small"}
-        color={"error"}
-        sx={{
-          fontSize: 10,
-        }}
-      >
-        Remove Consignment
-      </Button>
+
     </Box>
   );
 }

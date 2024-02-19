@@ -93,26 +93,29 @@ export default function AddressForm({ title, addresses, setAddress }) {
           onChange={(event, newValue) => handleSelectBilling(newValue)}
           margin="normal"
           size={"small"}
-          sx={{
-            width: 500,
-          }}
+          sx={{ width: 400 }}
         />
-        <Typography variant="subtitle1">Selected Address:</Typography>
+        
         {localBilling.first_name !== '' && (
           <Box>
+            <Typography variant="subtitle1">Selected Address:</Typography>
             <Typography variant="subtitle2">{`${localBilling.first_name}, ${localBilling.last_name}`}</Typography>
             <Typography variant="subtitle2">{`${localBilling.address1}, ${localBilling.city}, ${localBilling.state}, ${localBilling.postal_code}, ${localBilling.country}`}</Typography>
             <Typography variant="subtitle2">{`${localBilling.phone}`}</Typography>
             <Typography variant="subtitle2">{`Gift Message: ${localBilling.giftMessage}`}</Typography>
+            <Button
+              onClick={() => setModalOpen(true)}
+              disabled={localBilling === billingInfoEmpty}
+              size={"small"}
+              variant={"outlined"}
+            >
+              Update
+            </Button>
           </Box>
+
         )}
 
-        <Button
-          onClick={() => setModalOpen(true)}
-          disabled={localBilling === billingInfoEmpty}
-          size={"small"}
-          variant={"outlined"}
-        >Update</Button>
+
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <Box
