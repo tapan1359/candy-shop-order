@@ -46,6 +46,7 @@ export default function Shipping({addresses, products, consignment, removeConsig
   }
 
   const handleSelectModelItem = (item) => {
+    console.log('item', item)
     if (item) {
       setModelItem({
         id: item.id,
@@ -62,14 +63,14 @@ export default function Shipping({addresses, products, consignment, removeConsig
 
   const handleModalAddItem = () => {
     setSelectedProducts([...selectedProducts, modelItem]);
-    consignment.lineItems = [...consignment.lineItems, modelItem];
+    consignment.items = [...consignment.items, modelItem];
     setModalOpen(false);
     setModelItem(createDefaultLineItem());
   }
 
   const removeLineItem = (index) => {
     setSelectedProducts(selectedProducts.filter((_, i) => i !== index));
-    consignment.lineItems = consignment.lineItems.filter((_, i) => i !== index);
+    consignment.items = consignment.items.filter((_, i) => i !== index);
   }
 
   const handleUpdateField = (e) => {
@@ -79,6 +80,10 @@ export default function Shipping({addresses, products, consignment, removeConsig
       newItem.total = priceWithTax(newItem.price, newItem.quantity, newItem.tax);
     }
     setModelItem(newItem);
+  }
+
+  const handleManualInputChange = (value) => {
+    setModelItem({...modelItem, name: value});
   }
 
   return (
@@ -173,16 +178,18 @@ export default function Shipping({addresses, products, consignment, removeConsig
             transform: 'translate(80%, 50%)',
             gap: 2
           }}
-        >
+        >          
           <Autocomplete
             disabled={!products}
             sx={{ width: 300 }}
             id="combo-box-demo"
             options={products}
-            getOptionLabel={(option) => option.name}
+            getOptionLabel={(option) => option.name || ''}
             renderInput={(params) => <TextField {...params} label="Products " />}
             onChange={(event, newValue) => handleSelectModelItem(newValue)}
             filterOptions={(options, state) => options.filter((option) => option.name.toLowerCase().includes(state.inputValue.toLowerCase()))}
+            freeSolo
+            onInputChange={(e, value) => handleManualInputChange(value)}
           />
           <TextField
             sx={{ width: 300 }}

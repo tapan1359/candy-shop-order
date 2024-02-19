@@ -1,15 +1,31 @@
 import { api_bigCommerce } from '../api/api.bigCommerce';
 
 
-const convertToCartAPILineItems = (lineItems) => {
-  return lineItems.map((lineItem) => {
-    return {
-      "product_id": lineItem.id,
-      "quantity": lineItem.quantity,
-      "list_price": lineItem.price,
+const convertToCartAPIItems = (items) => {
+
+  const lineItems = [];
+  const customItems = [];
+
+  items.forEach((item) => {
+    if (item.id === undefined) {
+      customItems.push({
+        "name": item.name,
+        "quantity": item.quantity,
+        "list_price": item.price,
+        "sku": `custom-${item.name}`
+      });
+    } else {
+      lineItems.push({
+        "product_id": item.id,
+        "quantity": item.quantity,
+        "list_price": item.price,
+      });
     }
   });
+
+  return {lineItems, customItems};
 }
+
 
 const createBillingForAPI = (billing) => {
   console.log('billing', billing)
@@ -26,11 +42,28 @@ const createBillingForAPI = (billing) => {
   return billing;
 }
 
-export const createCart = async ({customerId, lineItems}) => {
-  const lineItemsForAPI = convertToCartAPILineItems(lineItems);
+
+const createLineItemsForConsignments = (consignment, cartLineItems) => {
+  return consignment.items.map((item) => {
+    let itemId;
+    if (item.id !== undefined) {
+      itemId = cartLineItems.physical_items.find((physicalItem) => physicalItem.product_id === item.id).id;
+    } else {
+      itemId = cartLineItems.custom_items.find((physicalItem) => physicalItem.name === item.name).id;
+    }
+    return {
+      "quantity": item.quantity,
+      "item_id": itemId
+    }
+  })
+}
+
+export const createCart = async ({customerId, items}) => {
+  const {lineItems, customItems} = convertToCartAPIItems(items);
   const response = await api_bigCommerce.post('/v3/carts', {
     "customer_id": customerId,
-    "line_items": lineItemsForAPI
+    "line_items": lineItems,
+    "custom_items": customItems
   });
   return response.data;
 }
@@ -50,13 +83,7 @@ export const createShippingConsignments = async ({checkoutId, consignments, cart
   const consignmentAddressForApi = consignments.map((consignment) => {
     return {
       "address": createBillingForAPI(consignment.address),
-      "line_items": consignment.lineItems.map((lineItem) => {
-        const item_id = cartLineItems.physical_items.find((physicalItem) => physicalItem.product_id === lineItem.id).id;
-        return {
-          "quantity": lineItem.quantity,
-          "item_id": item_id
-        }
-      })
+      "line_items": createLineItemsForConsignments(consignment, cartLineItems)
     }
   });
 

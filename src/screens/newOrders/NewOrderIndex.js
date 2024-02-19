@@ -36,7 +36,7 @@ const createDefaultConsignment = (id) => {
   return {
     "internalId": id,
     "address": {},
-    "lineItems": []
+    "items": []
   }
 }
 
@@ -96,7 +96,7 @@ export default function NewOrderIndex() {
       // Create Cart
       const cart = await createCart({
         customerId: customer.id,
-        lineItems: consignments.flatMap((consignment) => consignment.lineItems)
+        items: consignments.flatMap((consignment) => consignment.items)
       });
       console.log("cart", cart)
       const checkoutId = cart.data.id;
