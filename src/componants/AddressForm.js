@@ -241,7 +241,6 @@ export default function AddressForm({ title, addresses, setAddress }) {
                 value={localBilling.postal_code}
                 onChange={handleUpdateField}
                 margin="normal"
-                size={"small"}
               />
 
               <TextField

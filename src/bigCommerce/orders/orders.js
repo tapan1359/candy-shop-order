@@ -119,5 +119,5 @@ export const createOrder = async ({checkoutId}) => {
   const response = await api_bigCommerce.post(
     `/v3/checkouts/${checkoutId}/orders`
   );
-  return response.data;
+  return response.data.data.id;
 }

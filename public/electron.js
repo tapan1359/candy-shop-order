@@ -20,11 +20,11 @@ expressApp.use(cors());
 const xAuthToken = process.env.BIGCOMMERCE_ACCESS_TOKEN;
 const storeHash = process.env.BIGCOMMERCE_STORE_HASH;
 
-const bigCommerceProxy = createProxyMiddleware({
+const bigCommerceProxyApi = createProxyMiddleware("/api", {
   target: 'https://api.bigcommerce.com', // BigCommerce API base URL
   changeOrigin: true,
   pathRewrite: {
-    '^/bigcommerce': `/stores/${storeHash}`, // rewrite path
+    '^/api': `/stores/${storeHash}`, // rewrite path
   },
   onProxyReq: (proxyReq, req, res) => {
     // Set custom headers for BigCommerce
@@ -41,8 +41,28 @@ const bigCommerceProxy = createProxyMiddleware({
   },
 });
 
+const bigCommerceProxyPayments = createProxyMiddleware("/payments", {
+  target: 'https://payments.bigcommerce.com', // BigCommerce API base URL
+  changeOrigin: true,
+  pathRewrite: {
+    '^/payments': `/stores/${storeHash}`, // rewrite path
+  },
+  onProxyReq: (proxyReq, req, res) => {
+    proxyReq.setHeader('Accept', 'application/vnd.bc.v1+json');
+    proxyReq.setHeader('Content-Type', 'application/json');
+  },
+  onProxyRes(proxyRes, req, res) {
+    // console.log('proxyRes', proxyRes);
+    // Add CORS headers
+    proxyRes.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept';
+    proxyRes.headers['Access-Control-Allow-Origin'] = '*';
+    proxyRes.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'; // Add PUT to allowed methods
+  },
+});
+
 // Use the proxy middleware
-expressApp.use('/bigcommerce', bigCommerceProxy);
+expressApp.use(bigCommerceProxyApi);
+expressApp.use(bigCommerceProxyPayments);
 expressApp.post('/bigcommerce/v2/orders', (req, res) => {
   const data = req.body;
   const store = `/stores/${storeHash}`;
