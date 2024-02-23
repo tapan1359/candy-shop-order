@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box, TextField, Typography, FormControl, Autocomplete, Button, Modal, Divider,
 } from '@mui/material';
@@ -17,29 +17,16 @@ const billingInfoEmpty = {
   giftMessage: '',
 };
 
-export default function AddressForm({ title, addresses, setAddress }) {
-  const [localBilling, setLocalBilling] = useState(billingInfoEmpty);
+export default function AddressForm({ title, addresses, address, setAddress }) {
   const [modalOpen, setModalOpen] = useState(false);
 
-  const openModal = () => {
-    setModalOpen(true);
-  }
+  useEffect(() => {
+    setAddress(null);
+  }, [addresses]);
+
 
   const handleSelectBilling = async (address) => {
     if (address) {
-      setLocalBilling({
-        first_name: address.first_name,
-        last_name: address.last_name,
-        address1: address.address1,
-        address2: address.address2,
-        city: address.city,
-        state: address.state_or_province,
-        postal_code: address.postal_code,
-        country: address.country,
-        country_code: address.country_code,
-        phone: address.phone,
-        giftMessage: address.giftMessage,
-      });
       setAddress({
         first_name: address.first_name,
         last_name: address.last_name,
@@ -54,14 +41,12 @@ export default function AddressForm({ title, addresses, setAddress }) {
         giftMessage: address.giftMessage,
       });
     } else {
-      setLocalBilling(billingInfoEmpty);
       setAddress(billingInfoEmpty);
     }
   }
 
   const handleUpdateField = (e) => {
-    setLocalBilling({ ...localBilling, [e.target.name]: e.target.value });
-    setAddress({ ...localBilling, [e.target.name]: e.target.value });
+    setAddress({ ...address, [e.target.name]: e.target.value });
   }
 
 
@@ -93,19 +78,20 @@ export default function AddressForm({ title, addresses, setAddress }) {
           onChange={(event, newValue) => handleSelectBilling(newValue)}
           margin="normal"
           size={"small"}
+          value={address}
           sx={{ width: 400 }}
         />
         
-        {localBilling.first_name !== '' && (
+        {(address && address.first_name !== '') && (
           <Box>
             <Typography variant="subtitle1">Selected Address:</Typography>
-            <Typography variant="subtitle2">{`${localBilling.first_name}, ${localBilling.last_name}`}</Typography>
-            <Typography variant="subtitle2">{`${localBilling.address1}, ${localBilling.city}, ${localBilling.state}, ${localBilling.postal_code}, ${localBilling.country}`}</Typography>
-            <Typography variant="subtitle2">{`${localBilling.phone}`}</Typography>
-            <Typography variant="subtitle2">{`Gift Message: ${localBilling.giftMessage}`}</Typography>
+            <Typography variant="subtitle2">{`${address.first_name}, ${address.last_name}`}</Typography>
+            <Typography variant="subtitle2">{`${address.address1}, ${address.city}, ${address.state}, ${address.postal_code}, ${address.country}`}</Typography>
+            <Typography variant="subtitle2">{`${address.phone}`}</Typography>
+            <Typography variant="subtitle2">{`Gift Message: ${address.giftMessage}`}</Typography>
             <Button
               onClick={() => setModalOpen(true)}
-              disabled={localBilling === billingInfoEmpty}
+              disabled={address === billingInfoEmpty}
               size={"small"}
               variant={"outlined"}
             >
@@ -149,7 +135,7 @@ export default function AddressForm({ title, addresses, setAddress }) {
                 name="first_name"
                 label="First name"
                 fullWidth
-                value={localBilling.first_name}
+                value={address?.first_name}
                 onChange={handleUpdateField}
                 margin="normal"
                 size={"small"}
@@ -161,7 +147,7 @@ export default function AddressForm({ title, addresses, setAddress }) {
                 name="last_name"
                 label="Last name"
                 fullWidth
-                value={localBilling.last_name}
+                value={address?.last_name}
                 onChange={handleUpdateField}
                 margin="normal"
                 size={"small"}
@@ -174,7 +160,7 @@ export default function AddressForm({ title, addresses, setAddress }) {
               name="address1"
               label="Address line 1"
               fullWidth
-              value={localBilling.address1}
+              value={address?.address1}
               onChange={handleUpdateField}
               margin="normal"
               size={"small"}
@@ -185,7 +171,7 @@ export default function AddressForm({ title, addresses, setAddress }) {
               name="address2"
               label="Address line 2"
               fullWidth
-              value={localBilling.address2}
+              value={address?.address2}
               onChange={handleUpdateField}
               margin="normal"
               size={"small"}
@@ -205,7 +191,7 @@ export default function AddressForm({ title, addresses, setAddress }) {
                 name="city"
                 label="City"
                 fullWidth
-                value={localBilling.city}
+                value={address?.city}
                 onChange={handleUpdateField}
                 margin="normal"
                 size={"small"}
@@ -216,7 +202,7 @@ export default function AddressForm({ title, addresses, setAddress }) {
                 name="state"
                 label="State/Province/Region"
                 fullWidth
-                value={localBilling.state}
+                value={address?.state}
                 onChange={handleUpdateField}
                 margin="normal"
                 size={"small"}
@@ -238,7 +224,7 @@ export default function AddressForm({ title, addresses, setAddress }) {
                 name="postal_code"
                 label="Zip / Postal code"
                 fullWidth
-                value={localBilling.postal_code}
+                value={address?.postal_code}
                 onChange={handleUpdateField}
                 margin="normal"
               />
@@ -249,7 +235,7 @@ export default function AddressForm({ title, addresses, setAddress }) {
                 name="country"
                 label="Country"
                 fullWidth
-                value={localBilling.country}
+                value={address?.country}
                 onChange={handleUpdateField}
                 margin="normal"
                 size={"small"}
@@ -262,7 +248,7 @@ export default function AddressForm({ title, addresses, setAddress }) {
               name="phone"
               label="Phone Number"
               fullWidth
-              value={localBilling.phone}
+              value={address?.phone}
               onChange={handleUpdateField}
               margin="normal"
               size={"small"}
@@ -272,7 +258,7 @@ export default function AddressForm({ title, addresses, setAddress }) {
               name="giftMessage"
               label="Gift Message"
               fullWidth
-              value={localBilling.giftMessage}
+              value={address?.giftMessage}
               onChange={handleUpdateField}
               margin="normal"
               size={"small"}

@@ -2,7 +2,7 @@ import React from 'react';
 import {TextField, Autocomplete} from '@mui/material';
 
 
-export default function SelectCustomer({customers, setCustomer}) {
+export default function SelectCustomer({customers, customer, setCustomer}) {
 
   const handleCustomerSelect = (customer) => {
     setCustomer(customer);
@@ -13,6 +13,7 @@ export default function SelectCustomer({customers, setCustomer}) {
       fullWidth
       id="combo-box-demo"
       options={customers}
+      value={customer}
       getOptionLabel={(option) => `${option.first_name}, ${option.last_name}`}
       renderInput={(params) => <TextField {...params} label="Search by customer Name/Phone Number" />}
       onChange={(event, newValue) => handleCustomerSelect(newValue)}

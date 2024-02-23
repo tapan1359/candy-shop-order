@@ -37,12 +37,9 @@ function Header({ activePage, hndlePageChange }) {
 
   return (
     <AppBar position="fixed">
-      
       <Container maxWidth="xl">
-      
         <Toolbar disableGutters>
           <img src={"candy-logo.png"} alt={"candy-image"} />
-
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
               size="large"

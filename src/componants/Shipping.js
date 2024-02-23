@@ -36,10 +36,13 @@ const priceWithTax = (price, quantity, tax) => {
 export default function Shipping({addresses, products, consignment, removeConsignment}) {
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [modelItem, setModelItem] = useState(createDefaultLineItem());
+  const [modelItem, setModelItem] = useState(null);
   const [selectedProducts, setSelectedProducts] = useState([]);
+  const [dummy, setDummy] = useState(0);
+
   const setShippingAddress = (address) => {
     consignment.address = address;
+    setDummy(dummy + 1);
   }
 
   const openModal = () => {
@@ -63,10 +66,12 @@ export default function Shipping({addresses, products, consignment, removeConsig
   }
 
   const handleModalAddItem = () => {
-    setSelectedProducts([...selectedProducts, modelItem]);
-    consignment.items = [...consignment.items, modelItem];
+    if (modelItem) {
+      setSelectedProducts([...selectedProducts, modelItem]);
+      consignment.items = [...consignment.items, modelItem];
+      setModelItem(null);
+    }
     setModalOpen(false);
-    setModelItem(createDefaultLineItem());
   }
 
   const removeLineItem = (index) => {
@@ -101,7 +106,7 @@ export default function Shipping({addresses, products, consignment, removeConsig
       }}
     >
       <Box>
-        <AddressForm title={"Shipping"} addresses={addresses} setAddress={setShippingAddress} />
+        <AddressForm title={"Shipping"} addresses={addresses} address={consignment.address} setAddress={setShippingAddress} />
       </Box>
       <Divider orientation={"vertical"} flexItem />
       <Box
@@ -200,13 +205,13 @@ export default function Shipping({addresses, products, consignment, removeConsig
           <TextField
             sx={{ width: 300 }}
             name="sku"
-            value={modelItem.sku}
+            value={modelItem?.sku}
             label={"SKU"}
           />
           <TextField
             sx={{ width: 300 }}
             name="price" type="number"
-            value={modelItem.price}
+            value={modelItem?.price}
             label={"Price"}
             onChange={handleUpdateField}
           />
@@ -214,7 +219,7 @@ export default function Shipping({addresses, products, consignment, removeConsig
             sx={{ width: 300 }}
             name="quantity"
             type="number"
-            value={modelItem.quantity}
+            value={modelItem?.quantity}
             label={"Quantity"}
             onChange={handleUpdateField}
           />
@@ -222,14 +227,14 @@ export default function Shipping({addresses, products, consignment, removeConsig
             sx={{ width: 300 }}
             name="tax"
             type="number"
-            value={modelItem.tax}
+            value={modelItem?.tax}
             label={"Tax"}
             onChange={handleUpdateField}
           />
           <Typography
             variant="h6"
             sx={{ width: 300 }}
-          >{modelItem.total}</Typography>
+          >{modelItem?.total}</Typography>
           <Button
             onClick={handleModalAddItem}
             size={"small"}

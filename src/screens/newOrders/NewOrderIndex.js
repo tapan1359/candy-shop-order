@@ -24,7 +24,7 @@ import {processOrderPayment} from "../../bigCommerce/payment/payments";
 const createDefaultConsignment = (id) => {
   return {
     "internalId": id,
-    "address": {},
+    "address": null,
     "items": []
   }
 }
@@ -92,12 +92,16 @@ export default function NewOrderIndex() {
       setLoading(true);
       setError(null);
 
+      if (consignments.some((consignment) => !consignment.address || consignment.items.length === 0)) {
+        setError("Invalid consignments. check address and items.");
+        return
+      }
+
       // Create Cart
       const cart = await createCart({
         customerId: customer.id,
         items: consignments.flatMap((consignment) => consignment.items)
       });
-      console.log("cart", cart)
       const checkoutId = cart.data.id;
 
       // Create Consignments
@@ -174,7 +178,21 @@ export default function NewOrderIndex() {
 
   return (
     <>
-      {error && <Alert severity="error" onClose={() => setError(null)}>{error}</Alert>}
+      
+      {error && (
+        <Alert
+          severity="error"
+          onClose={() => setError(null)}
+          sx={{
+            position: 'fixed',
+            top: '16px',
+            right: '16px',
+            zIndex: 9999,
+          }}
+        >
+          {error}
+        </Alert>
+      )}
       <Box
         sx={{
           display: 'flex',
@@ -191,16 +209,13 @@ export default function NewOrderIndex() {
             justifyContent: 'space-around',
           }}
         >
-          <SelectCustomer customers={customers} setCustomer={setCustomer} />
-          <Button
-            color={'error'}
-            onClick={resetPage}
-          >
+          <SelectCustomer customers={customers} customer={customer} setCustomer={setCustomer} />
+          <Button color={'error'} onClick={resetPage}>
             RESET
           </Button>
         </Box>
         <Divider />
-        <AddressForm title={"Billing Address"} addresses={customer?.addresses} setAddress={setBilling} />
+        <AddressForm title={"Billing Address"} addresses={customer?.addresses} address={billing} setAddress={setBilling} />
         <Divider />
 
         <Typography variant="h6">Consignments</Typography>
