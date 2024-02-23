@@ -8,26 +8,27 @@ import NewOrderIndex from './screens/newOrders/NewOrderIndex';
 import UpdateDataScreen from './screens/update/UpdateData';
 
 
+export const theme = createTheme({
+  palette: {
+    mode: 'light',
+    primary: {
+      main: '#659DBD',
+    },
+    secondary: {
+      main: '#DAAD86',
+    },
+  },
+  typography: {
+    fontFamily: 'monospace',
+    fontSize: 11,
+  },    
+});
+
+
 function App() {
   const [activePage, setActivePage] = useState('New Orders');
 
-  // Create a custom theme
-  const theme = createTheme({
-    palette: {
-      mode: 'light',
-      primary: {
-        main: '#659DBD',
-      },
-      secondary: {
-        main: '#DAAD86',
-      },
-    },
-    typography: {
-      fontFamily: 'monospace',
-      fontSize: 11,
-    },    
-  });
-
+  // Create a custom them
   return (
     <ThemeProvider theme={theme}>
       <Box className="App">

@@ -121,3 +121,18 @@ export const createOrder = async ({checkoutId}) => {
   );
   return response.data.data.id;
 }
+
+
+export const getOrder = async (orderId) => {
+  const response = await api_bigCommerce.get(
+    `/v3/orders/${orderId}`
+  );
+  return response.data;
+}
+
+export const getCheckout = async (checkoutId) => {
+  const response = await api_bigCommerce.get(
+    `/v3/checkouts/${checkoutId}`
+  );
+  return response.data;
+}

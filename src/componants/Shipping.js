@@ -36,7 +36,7 @@ const priceWithTax = (price, quantity, tax) => {
 export default function Shipping({addresses, products, consignment, removeConsignment}) {
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [modelItem, setModelItem] = useState(null);
+  const [modelItem, setModelItem] = useState(createDefaultLineItem());
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [dummy, setDummy] = useState(0);
 
@@ -69,9 +69,9 @@ export default function Shipping({addresses, products, consignment, removeConsig
     if (modelItem) {
       setSelectedProducts([...selectedProducts, modelItem]);
       consignment.items = [...consignment.items, modelItem];
-      setModelItem(null);
     }
     setModalOpen(false);
+    setModelItem(createDefaultLineItem());
   }
 
   const removeLineItem = (index) => {
@@ -234,7 +234,9 @@ export default function Shipping({addresses, products, consignment, removeConsig
           <Typography
             variant="h6"
             sx={{ width: 300 }}
-          >{modelItem?.total}</Typography>
+          >
+            {modelItem?.total}
+          </Typography>
           <Button
             onClick={handleModalAddItem}
             size={"small"}

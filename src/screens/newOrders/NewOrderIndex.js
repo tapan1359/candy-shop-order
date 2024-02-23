@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   Alert,
   Box,
@@ -15,10 +15,14 @@ import {
   addCheckoutBillingAddress,
   addShippingOptions,
   createCart, createOrder,
-  createShippingConsignments
+  createShippingConsignments,
+  getCheckout,
+  getOrder
 } from "../../bigCommerce/orders/orders";
 import {ShippingOptions} from "../../componants/ShippingOptions";
 import {processOrderPayment} from "../../bigCommerce/payment/payments";
+import { setCart, setOrder, setCheckout } from '../../redux/bigCommerce/newOrderSlice';
+import FloatOrderDetails from '../../componants/floatOrderDetails';
 
 
 const createDefaultConsignment = (id) => {
@@ -35,6 +39,9 @@ export default function NewOrderIndex() {
 
   const customers = useSelector((state) => state.data.customers);
   const products = useSelector((state) => state.data.products);
+
+
+
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
   const [customer, setCustomer] = React.useState(null);
@@ -103,6 +110,7 @@ export default function NewOrderIndex() {
         items: consignments.flatMap((consignment) => consignment.items)
       });
       const checkoutId = cart.data.id;
+      setCart(cart.data);
 
       // Create Consignments
       const consignmentResponse = await createShippingConsignments({
@@ -110,6 +118,8 @@ export default function NewOrderIndex() {
         consignments,
         cartLineItems: cart.data.line_items
       });
+
+      setCheckout(cart.data);
 
       // consignmentResponse.data.consignments.
       setAPIConsignments(consignmentResponse.data.consignments);
@@ -133,12 +143,20 @@ export default function NewOrderIndex() {
       setLoading(true);
       setError(null);
 
-      await addCheckoutBillingAddress({checkoutId, billingAddress: billing});
+      let checkout = await addCheckoutBillingAddress({checkoutId, billingAddress: billing});
+      setCheckout(checkout);
+
 
       await addShippingOptions({checkoutId, consignmentToShippingMapping});
+      checkout = await getCheckout({checkoutId});
+      setCheckout(checkout);
 
       const orderId = await createOrder({checkoutId});
       setOrderId(orderId);
+      
+      const order = await getOrder({orderId});
+      setOrder(order);
+
 
     } catch (error) {
       console.log('error creating order', error);
@@ -148,7 +166,6 @@ export default function NewOrderIndex() {
     }
     finally {
       setLoading(false);
-      resetPage();
     }
 
   }
@@ -157,6 +174,11 @@ export default function NewOrderIndex() {
     try {
       setLoading(true);
       setError(null);
+      
+      if (!orderId || !paymentInfo) {
+        setError("provide payment info!");
+        return;
+      }
 
       if (orderId && paymentInfo) {
         await processOrderPayment({orderId, paymentInfo});
@@ -178,7 +200,7 @@ export default function NewOrderIndex() {
 
   return (
     <>
-      
+      <FloatOrderDetails />
       {error && (
         <Alert
           severity="error"
