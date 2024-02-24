@@ -41,17 +41,15 @@ export default function OrderIndex() {
   const handleGetPrinters = async () => {
     const fetchedPrinters = await getPrinters();
     const printersWithName = fetchedPrinters.map((printer) => printer.name);
-    console.log('printersWithName', printersWithName);
     setPrinters(printersWithName);
   };
 
   const getShipping = (order) =>  {
     const shipping = order.consignments.map((consignment) => {
-      console.log(consignment.shipping);
       if (consignment?.shipping && consignment.shipping.length > 0) {
-        return consignment.shipping[0];
+        return consignment.shipping;
       }
-    }).filter((item) => item !== undefined);
+    }).filter((item) => item !== undefined).flat();
     return shipping;
   }
 
@@ -82,7 +80,7 @@ export default function OrderIndex() {
           paddingLeft: 2,
         }}
       >
-        {orders.map((order) => (
+        {orders && orders?.map((order) => (
           <Accordion key={order.id} expanded={expanded === order.id} onChange={() => setExpanded(order.id)}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Box
@@ -148,9 +146,9 @@ export default function OrderIndex() {
                 )}
 
 
-                {getShipping(order)?.map((shipping) => (
+                {getShipping(order)?.map((shipping, index) => (
                   <Box key={shipping.id}>
-                    <Typography variant={"subtitle1"}>Shipping Address</Typography>
+                    <Typography variant={"subtitle1"}>Shipping Address {index + 1}</Typography>
                     <Typography variant={"subtitle2"}>{order.billing_address.first_name} {order.billing_address.last_name}</Typography>
                     <Typography variant={"subtitle2"}>{order.billing_address.street_1}</Typography>
                     <Typography variant={"subtitle2"}>{order.billing_address.city}, {order.billing_address.state} {order.billing_address.zip}</Typography>

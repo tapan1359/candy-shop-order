@@ -7,7 +7,7 @@ import {
   Typography,
   Modal,
 } from '@mui/material';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import SelectCustomer from '../../componants/SelectCustomer';
 import Shipping from "../../componants/Shipping";
 import AddressForm from "../../componants/AddressForm";
@@ -37,10 +37,10 @@ let consignmentInteralId = 0
 
 export default function NewOrderIndex() {
 
+  const dispatch = useDispatch();
   const customers = useSelector((state) => state.data.customers);
   const products = useSelector((state) => state.data.products);
-
-
+  const order = useSelector((state) => state.newOrders.order);
 
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
@@ -53,6 +53,7 @@ export default function NewOrderIndex() {
   const [orderId, setOrderId] = React.useState(null);
   const [paymentModalOpen, setPaymentModalOpen] = React.useState(false);
   const [paymentInfo, setPaymentInfo] = React.useState(null);
+  
 
 
 
@@ -64,6 +65,9 @@ export default function NewOrderIndex() {
     setAPIConsignments([]);
     setConsignmentToShippingMapping({});
     setCheckoutId(null);
+    dispatch(setCart(null));
+    dispatch(setOrder(null));
+    dispatch(setCheckout(null));
   }
 
   const resetOrder = () => {
@@ -80,6 +84,24 @@ export default function NewOrderIndex() {
     setConsignments(consignments.filter((consignment) => consignment.internalId !== internalId));
   }
 
+  const updateConsignmentShippingAddress = (internalId, address) => {
+    setConsignments(consignments.map((consignment) => {
+      if (consignment.internalId === internalId) {
+        return {...consignment, address};
+      }
+      return consignment;
+    }));
+  }
+
+  const updateConsignmentItems = (internalId, items) => {
+    setConsignments(consignments.map((consignment) => {
+      if (consignment.internalId === internalId) {
+        return {...consignment, items};
+      }
+      return consignment;
+    }));
+  }
+
   const disableCreateCart = () => {
     if (!customer || !billing || consignments.length === 0) {
       return true;
@@ -91,6 +113,10 @@ export default function NewOrderIndex() {
     if (!checkoutId || !consignmentToShippingMapping) {
       return true;
     }
+  }
+
+  const setShippingOption = (consignmentId, shippingOptionId) => {
+    setConsignmentToShippingMapping({...consignmentToShippingMapping, [consignmentId]: shippingOptionId});
   }
 
   const handleSubmit = async () => {
@@ -110,7 +136,7 @@ export default function NewOrderIndex() {
         items: consignments.flatMap((consignment) => consignment.items)
       });
       const checkoutId = cart.data.id;
-      setCart(cart.data);
+      dispatch(setCart(cart.data));
 
       // Create Consignments
       const consignmentResponse = await createShippingConsignments({
@@ -119,7 +145,7 @@ export default function NewOrderIndex() {
         cartLineItems: cart.data.line_items
       });
 
-      setCheckout(cart.data);
+      dispatch(setCheckout(consignmentResponse.data));
 
       // consignmentResponse.data.consignments.
       setAPIConsignments(consignmentResponse.data.consignments);
@@ -127,11 +153,9 @@ export default function NewOrderIndex() {
       setCheckoutId(checkoutId);
 
     } catch (error) {
-      console.log('error creating order', error);
       const data = error.response.data;
       setError(JSON.stringify(data?.title));
       setLoading(false);
-      console.log('error creating order', error);
     } finally {
       setLoading(false);
     }
@@ -143,23 +167,28 @@ export default function NewOrderIndex() {
       setLoading(true);
       setError(null);
 
-      let checkout = await addCheckoutBillingAddress({checkoutId, billingAddress: billing});
-      setCheckout(checkout);
+      if (orderId) {
+        setError("Order already created!");
+        return;
+      }
 
+
+      let checkout = await addCheckoutBillingAddress({checkoutId, billingAddress: billing});
+      dispatch(setCheckout(checkout));
 
       await addShippingOptions({checkoutId, consignmentToShippingMapping});
       checkout = await getCheckout({checkoutId});
-      setCheckout(checkout);
+      dispatch(setCheckout(checkout));
 
-      const orderId = await createOrder({checkoutId});
-      setOrderId(orderId);
+      const responseOrderId = await createOrder({checkoutId});
+      setOrderId(responseOrderId);
       
-      const order = await getOrder({orderId});
-      setOrder(order);
+      
+      const order = await getOrder({orderId: responseOrderId});
+      dispatch(setOrder(order));
 
 
     } catch (error) {
-      console.log('error creating order', error);
       const data = error.response.data;
       setError(JSON.stringify(data?.title));
       setLoading(false);
@@ -186,9 +215,9 @@ export default function NewOrderIndex() {
 
       setPaymentModalOpen(false);
       resetOrder();
+      resetPage();
 
     } catch (error) {
-      console.log('error creating order', error);
       const data = error.response.data;
       setError(JSON.stringify(data?.title));
       setLoading(false);
@@ -252,7 +281,15 @@ export default function NewOrderIndex() {
               borderRadius: 2,
             }}
           >
-            <Shipping key={consignment.internalId} addresses={customer?.addresses} products={products} consignment={consignment} removeConsignment={removeConsignment} />
+            <Shipping 
+              key={consignment.internalId} 
+              addresses={customer?.addresses} 
+              products={products} 
+              consignment={consignment} 
+              updateConsignmentShippingAddress={updateConsignmentShippingAddress}
+              updateConsignmentItems={updateConsignmentItems}
+              removeConsignment={removeConsignment} 
+            />
           </Box>
         ))}
         <Button
@@ -269,7 +306,7 @@ export default function NewOrderIndex() {
           {loading ? "Loading..." : "Create Cart and Get Shipping Options"}
         </Button>
         <Divider />
-        <ShippingOptions APIConsignments={APIConsignments} setConsignmentIdToShippingMapping={setConsignmentToShippingMapping} />
+        <ShippingOptions APIConsignments={APIConsignments} setShippingOption={setShippingOption} />
         <Divider />
         <Button
           size={"large"}
@@ -307,6 +344,7 @@ export default function NewOrderIndex() {
             }}
           >
             <Typography variant="h6">Payment Info</Typography>
+            <Typography variant="h6">Total: {order?.total_inc_tax}</Typography>
             <TextField
               label="Name on Card"
               value={paymentInfo?.nameOnCard}

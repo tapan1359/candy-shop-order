@@ -33,16 +33,13 @@ const priceWithTax = (price, quantity, tax) => {
   return (totalPrice + calculatedTax).toFixed(2);
 }
 
-export default function Shipping({addresses, products, consignment, removeConsignment}) {
+export default function Shipping({addresses, products, consignment, updateConsignmentShippingAddress, updateConsignmentItems, removeConsignment}) {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modelItem, setModelItem] = useState(createDefaultLineItem());
-  const [selectedProducts, setSelectedProducts] = useState([]);
-  const [dummy, setDummy] = useState(0);
 
   const setShippingAddress = (address) => {
-    consignment.address = address;
-    setDummy(dummy + 1);
+    updateConsignmentShippingAddress(consignment.internalId, address);
   }
 
   const openModal = () => {
@@ -50,7 +47,6 @@ export default function Shipping({addresses, products, consignment, removeConsig
   }
 
   const handleSelectModelItem = (item) => {
-    console.log('item', item)
     if (item) {
       setModelItem({
         id: item.id,
@@ -67,7 +63,6 @@ export default function Shipping({addresses, products, consignment, removeConsig
 
   const handleModalAddItem = () => {
     if (modelItem) {
-      setSelectedProducts([...selectedProducts, modelItem]);
       consignment.items = [...consignment.items, modelItem];
     }
     setModalOpen(false);
@@ -75,8 +70,8 @@ export default function Shipping({addresses, products, consignment, removeConsig
   }
 
   const removeLineItem = (index) => {
-    setSelectedProducts(selectedProducts.filter((_, i) => i !== index));
-    consignment.items = consignment.items.filter((_, i) => i !== index);
+    consignment.items.splice(index, 1);
+    updateConsignmentItems(consignment.internalId, consignment.items);
   }
 
   const handleUpdateField = (e) => {
@@ -143,7 +138,7 @@ export default function Shipping({addresses, products, consignment, removeConsig
             </TableHead>
             <TableBody>
               {/* Existing Line Items */}
-              {selectedProducts.map((item, i) => (
+              {consignment?.items.map((item, i) => (
                   <TableRow key={i}>
                     <TableCell><img src={item.image} alt={item.name} width="50" height="50" /></TableCell>
                     <TableCell>{item.sku}</TableCell>

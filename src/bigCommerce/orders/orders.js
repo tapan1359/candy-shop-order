@@ -28,7 +28,6 @@ const convertToCartAPIItems = (items) => {
 
 
 const createBillingForAPI = (billing) => {
-  console.log('billing', billing)
   if (billing.giftMessage) {
     billing["custom_fields"] = [
       {
@@ -96,24 +95,29 @@ export const createShippingConsignments = async ({checkoutId, consignments, cart
 }
 
 
-export const addShippingOptions = async ({checkoutId, consignmentToShippingMapping}) => {
-  console.log("consignmentToShippingMapping", consignmentToShippingMapping)
-  return new Promise((resolve, reject) => {
-    const consignmentIds = Object.keys(consignmentToShippingMapping);
-    const promises = consignmentIds.map((consignmentId) => {
-      return api_bigCommerce.put(
+export const addShippingOptions = async ({ checkoutId, consignmentToShippingMapping }) => {
+
+  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  const consignmentIds = Object.keys(consignmentToShippingMapping);
+  const results = [];
+
+  for (const consignmentId of consignmentIds) {
+    try {
+      const response = await api_bigCommerce.put(
         `/v3/checkouts/${checkoutId}/consignments/${consignmentId}`,
         { "shipping_option_id": consignmentToShippingMapping[consignmentId] }
       );
-    });
+      results.push(response);
+      await sleep(5000);
+    } catch (error) {
+      throw error;
+    }
+  }
 
-    Promise.all(promises).then((values) => {
-      resolve(values);
-    }).catch((error) => {
-      reject(error);
-    });
-  });
-}
+  return results;
+};
+
 
 export const createOrder = async ({checkoutId}) => {
   const response = await api_bigCommerce.post(
@@ -123,14 +127,14 @@ export const createOrder = async ({checkoutId}) => {
 }
 
 
-export const getOrder = async (orderId) => {
+export const getOrder = async ({orderId}) => {
   const response = await api_bigCommerce.get(
-    `/v3/orders/${orderId}`
+    `/v2/orders/${orderId}`
   );
   return response.data;
 }
 
-export const getCheckout = async (checkoutId) => {
+export const getCheckout = async ({checkoutId}) => {
   const response = await api_bigCommerce.get(
     `/v3/checkouts/${checkoutId}`
   );
