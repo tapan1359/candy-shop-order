@@ -22,6 +22,7 @@
     "electron-is-dev": "^2.0.0",
     "electronmon": "^2.0.2",
     "fs": "^0.0.1-security",
+    "get-stream": "6.0.0",
     "moment": "^2.29.4",
     "pdf-to-printer": "^5.6.0",
     "pdfkit": "^0.14.0",
@@ -40,11 +41,13 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "express": "node express.js",
     "electron:dev": "npx electronmon .",
-    "start:dev": "concurrently  \"npm run electron:dev\" \"npm run start\"",
+    "start:dev": "concurrently  \"npm run express\" \"npm run start\"",
     "build-electron": "electron-builder build",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx --fix"
   },
+  "proxy": "http://localhost:6868",
   "eslintConfig": {
     "extends": [
       "react-app",

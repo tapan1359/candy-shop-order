@@ -269,7 +269,7 @@ export default function NewOrderIndex() {
         <AddressForm title={"Billing Address"} addresses={customer?.addresses} address={billing} setAddress={setBilling} />
         <Divider />
 
-        <Typography variant="h6">Consignments</Typography>
+        <Typography variant="h6">Shipping Addresses</Typography>
         {consignments.map((consignment) => (
           <Box
             key={consignment.internalId}

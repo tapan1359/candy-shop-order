@@ -4,7 +4,6 @@ import StartEndTimePicker from '../../componants/StartEndTimePicker';
 import OrderLineItem from './OrderLineItem';
 import { getOrderStatus } from '../../bigCommerce/orders/orders.get';
 import { setOrderStatuses } from '../../redux/bigCommerce/ordersSlice';
-import { getPrinters, printPDF } from '../../print';
 import {
   Autocomplete,
   TextField,
@@ -30,18 +29,11 @@ export default function OrderIndex() {
 
   useEffect(() => {
     handleGetOrderStatus();
-    handleGetPrinters();
   }, []);
 
   const handleGetOrderStatus = async () => {
     const orderStatus = await getOrderStatus();
     dispatch(setOrderStatuses(orderStatus));
-  };
-
-  const handleGetPrinters = async () => {
-    const fetchedPrinters = await getPrinters();
-    const printersWithName = fetchedPrinters.map((printer) => printer.name);
-    setPrinters(printersWithName);
   };
 
   const getShipping = (order) =>  {
@@ -54,7 +46,32 @@ export default function OrderIndex() {
   }
 
   const printOrder = async (text) => {
-    await printPDF(text, selectedPrinter, 100, 100);
+    try {
+      const response = await fetch('/create-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: text }),
+      });
+      
+      console.log('response', response);
+      if (response.ok) {
+        
+        const blob = await response.blob();
+        const printWindow = window.open(URL.createObjectURL(blob), '_blank');
+        printWindow.focus();
+        // In some browsers you may have to add a delay for the blob to be ready
+        setTimeout(() => {
+          printWindow.print();
+          // You might need to close the window after a delay as well
+        }, 500);
+      } else {
+        console.error('Failed to create PDF');
+      }
+    } catch (error) {
+      console.error('Error printing order:', error);
+    }
   };
 
   return (
@@ -116,8 +133,12 @@ export default function OrderIndex() {
                     <Typography variant={"subtitle1"}>Customer Message</Typography>
                     <Typography variant={"subtitle2"}>{order.customer_message}</Typography>
                     <Button
+                      sx={{
+                        color: 'Black',
+                        fontWeight: 'bold',
+                      }}
                       size={"small"}
-                      variant={"outlined"}
+                      variant="contained"
                       onClick={() => printOrder(order.customer_message)}
                     >
                       Print</Button>
@@ -134,8 +155,12 @@ export default function OrderIndex() {
                         <div key={field.name}>
                           <Typography variant={"subtitle2"}>Gift Message: {field.value}</Typography>
                           <Button
+                            sx={{
+                              color: 'Black',
+                              fontWeight: 'bold',
+                            }}
                             size={"small"}
-                            variant={"outlined"}
+                            variant="contained"
                             onClick={() => printOrder(field.value)}
                           >
                             Print</Button>
@@ -157,8 +182,12 @@ export default function OrderIndex() {
                         <div key={field.name}>
                           <Typography variant={"subtitle2"}>Gift Message: {field.value}</Typography>
                           <Button
+                          sx={{
+                            color: 'Black',
+                            fontWeight: 'bold',
+                          }}
                             size={"small"}
-                            variant={"outlined"}
+                            variant="contained"
                             onClick={() => printOrder(field.value)}
                           >
                             Print</Button>

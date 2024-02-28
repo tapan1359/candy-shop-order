@@ -192,8 +192,15 @@ export default function Shipping({addresses, products, consignment, updateConsig
             options={products}
             getOptionLabel={(option) => option.name || ''}
             renderInput={(params) => <TextField {...params} label="Products " />}
+            renderOption={(props, option) => (
+              <li {...props}>
+                <img src={option.primary_image?.url_standard} alt={option.name} width="50" height="50" />
+                {option.name}
+              </li>
+            )}
+            
             onChange={(event, newValue) => handleSelectModelItem(newValue)}
-            filterOptions={(options, state) => options.filter((option) => option.name.toLowerCase().includes(state.inputValue.toLowerCase()))}
+            filterOptions={(options, state) => options.filter((option) => option.name.toLowerCase().includes(state.inputValue.toLowerCase()) || option.sku.toLowerCase().includes(state.inputValue.toLowerCase()))}
             freeSolo
             onInputChange={(e, value) => handleManualInputChange(value)}
           />
