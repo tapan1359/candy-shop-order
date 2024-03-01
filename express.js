@@ -3,6 +3,7 @@ const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const PDFDocument = require('pdfkit');
 const getStream = require('get-stream');
+const path = require('path');
 
 
 
@@ -10,7 +11,14 @@ const getStream = require('get-stream');
 const app = express();
 const port = process.env.PORT || 6868;
 
+// // Serve static files from the React app
+// app.use(express.static(path.join(__dirname, './build')));
 
+// // The "catchall" handler: for any request that doesn't
+// // match one above, send back React's index.html file.
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, './', 'index.html'));
+// });
 
 // Body parser middleware to parse request bodies
 app.use(express.json());
@@ -18,7 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // CORS middleware for cross-origin requests
 const cors = require('cors');
-app.use(cors());
+app.use(cors({ origin: '*' }));
 
 // Proxy middleware for BigCommerce API
 app.use('/api', createProxyMiddleware({
