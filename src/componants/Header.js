@@ -13,7 +13,7 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 
-const pages = ['Orders', 'New Orders', 'Update Data'];
+const pages = ['Orders', 'New Orders', 'Update Data', 'Logout'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 function Header({ activePage, hndlePageChange }) {

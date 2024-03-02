@@ -5,6 +5,7 @@ import { persistReducer, persistStore } from 'redux-persist';
 import ordersSlice from './bigCommerce/ordersSlice';
 import newOrdersSlice from './bigCommerce/newOrderSlice';
 import dataSlice from './bigCommerce/data';
+import userSlice from './user';
 
 const persistConfig = {
   key: 'root',
@@ -18,6 +19,7 @@ export const store = configureStore({
     orders: ordersSlice,
     newOrders: newOrdersSlice,
     data: persistedDataReducer,
+    user: userSlice,
   },
 });
 
