@@ -21,8 +21,7 @@ const port = process.env.PORT || 6868;
 // });
 
 // Body parser middleware to parse request bodies
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
+
 
 // CORS middleware for cross-origin requests
 const cors = require('cors');
@@ -59,7 +58,11 @@ app.use('/payments', createProxyMiddleware({
   },
 }));
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.post('/create-pdf', async (req, res) => {
+  console.log('Creating PDF with message:', req.body);
   const doc = new PDFDocument({ size: [2.25 * 72, 3.5 * 72], margin: 0 });
 
   // Write content to PDF
