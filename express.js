@@ -21,8 +21,8 @@ const port = process.env.PORT || 6868;
 // });
 
 // Body parser middleware to parse request bodies
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
 
 // CORS middleware for cross-origin requests
 const cors = require('cors');
@@ -36,6 +36,15 @@ app.use('/api', createProxyMiddleware({
   onProxyReq: (proxyReq, req) => {
     proxyReq.setHeader('X-Auth-Token', process.env.BIGCOMMERCE_ACCESS_TOKEN);
     proxyReq.setHeader('Accept', 'application/json');
+    proxyReq.setHeader('Content-Type', 'application/json');
+  },
+  onProxyRes: (proxyRes, req, res) => {
+    console.log(`Received response with status: ${proxyRes.statusCode}`);
+  },
+  onError: (err, req, res) => {
+      console.log(`Proxy error: ${err.message}`);
+      console.log(`Proxy error: ${err.stack}`);
+      console.log(`Proxy error: ${res.message}`);
   },
 }));
 

@@ -58,10 +58,14 @@ function App() {
   }
 
   useEffect(() => {
+
+
     getCurrentUser().then((user) => {
       if (user) {
         dispatch(logIn());
       }
+    }).catch((err) => {
+      console.log('error getting current user', err);
     });
   }, []);
 
