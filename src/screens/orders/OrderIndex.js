@@ -80,15 +80,6 @@ export default function OrderIndex() {
         <Grid item xs={6}>
           <StartEndTimePicker />
         </Grid>
-        <Grid item xs={6}>
-        <div style={{ width: '300px' }}>
-            <Autocomplete
-              options={printers}
-              renderInput={(params) => <TextField {...params} label="Select a Printer" />}
-              onChange={(e, newValue) => setSelectedPrinter(newValue)}
-            />
-          </div>
-        </Grid>
       </Grid>
       <Box
         sx={{
