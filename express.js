@@ -78,12 +78,45 @@ app.post('/create-pdf', async (req, res) => {
 
   // Calculate the starting positions to center the text
   const startX = (docWidth - textWidth) / 2;
+
   const startY = (docHeight - textHeight) / 2;
 
+  const centerX = docWidth / 2;
+  const centerY = docHeight / 2;
+
+  doc.translate(centerX, centerY);
+  doc.rotate(90);
+
+
+  // if (textHeight < 15) {
+  //   Y = 0
+  // } else if (textHeight < 25) {
+  //   Y = -5
+  // } else if (textHeight < 57) {
+  //   Y = -15
+  // } else if (textHeight < 110) {
+  //   Y = -30
+  // } else if(textHeight < 150) {
+  //   Y = -45
+  // } else if (textHeight < 200) {
+  //   Y = -60
+  // } else {
+  //    Y = -70
+  // } 
+
+  const m = -0.353;
+  const b = 4.944;
+  let Y = m * textHeight + b;
+  Y = Math.max(Y, -65);
+
+
+  console.log('textHeight', textHeight);
+  console.log('Y', Y);
+
   // Write content to PDF
-  doc.text(req.body.message, startX, startY, {
-    width: docWidth,
-    align: 'center',
+  doc.text(req.body.message, -centerY, Y, {
+    width: docHeight,
+    align: "center"
   });
   
   // Finalize PDF file
