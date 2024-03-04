@@ -65,9 +65,27 @@ app.post('/create-pdf', async (req, res) => {
   console.log('Creating PDF with message:', req.body);
   const doc = new PDFDocument({ size: [2.25 * 72, 3.5 * 72], margin: 0 });
 
-  // Write content to PDF
-  doc.fontSize(10).text(req.body.message, 10, 10);
+  // Assuming you want to center the message in the document
+  const docWidth = 2.25 * 72;
+  const docHeight = 3.5 * 72;
 
+  // Write content to PDF
+  doc.fontSize(10);
+
+  // Measure the text
+  const textWidth = doc.widthOfString(req.body.message);
+  const textHeight = doc.heightOfString(req.body.message, {width: docWidth});
+
+  // Calculate the starting positions to center the text
+  const startX = (docWidth - textWidth) / 2;
+  const startY = (docHeight - textHeight) / 2;
+
+  // Write content to PDF
+  doc.text(req.body.message, startX, startY, {
+    width: docWidth,
+    align: 'center',
+  });
+  
   // Finalize PDF file
   doc.end();
 
