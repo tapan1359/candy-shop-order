@@ -1,9 +1,6 @@
 // Express setup
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
-const PDFDocument = require('pdfkit');
-const getStream = require('get-stream');
-const path = require('path');
 
 
 
@@ -61,79 +58,79 @@ app.use('/payments', createProxyMiddleware({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.post('/create-pdf', async (req, res) => {
-  console.log('Creating PDF with message:', req.body);
-  const doc = new PDFDocument({ size: [2.25 * 72, 3.5 * 72], margin: 0 });
+// app.post('/create-pdf', async (req, res) => {
+//   console.log('Creating PDF with message:', req.body);
+//   const doc = new PDFDocument({ size: [2.25 * 72, 3.5 * 72], margin: 0 });
 
-  // Assuming you want to center the message in the document
-  const docWidth = 2.25 * 72;
-  const docHeight = 3.5 * 72;
+//   // Assuming you want to center the message in the document
+//   const docWidth = 2.25 * 72;
+//   const docHeight = 3.5 * 72;
 
-  // Write content to PDF
-  doc.fontSize(10);
+//   // Write content to PDF
+//   doc.fontSize(10);
 
-  // Measure the text
-  const textWidth = doc.widthOfString(req.body.message);
-  const textHeight = doc.heightOfString(req.body.message, {width: docWidth});
+//   // Measure the text
+//   const textWidth = doc.widthOfString(req.body.message);
+//   const textHeight = doc.heightOfString(req.body.message, {width: docWidth});
 
-  // Calculate the starting positions to center the text
-  const startX = (docWidth - textWidth) / 2;
+//   // Calculate the starting positions to center the text
+//   const startX = (docWidth - textWidth) / 2;
 
-  const startY = (docHeight - textHeight) / 2;
+//   const startY = (docHeight - textHeight) / 2;
 
-  const centerX = docWidth / 2;
-  const centerY = docHeight / 2;
+//   const centerX = docWidth / 2;
+//   const centerY = docHeight / 2;
 
-  doc.translate(centerX, centerY);
-  doc.rotate(90);
-
-
-  // if (textHeight < 15) {
-  //   Y = 0
-  // } else if (textHeight < 25) {
-  //   Y = -5
-  // } else if (textHeight < 57) {
-  //   Y = -15
-  // } else if (textHeight < 110) {
-  //   Y = -30
-  // } else if(textHeight < 150) {
-  //   Y = -45
-  // } else if (textHeight < 200) {
-  //   Y = -60
-  // } else {
-  //    Y = -70
-  // } 
-
-  const m = -0.353;
-  const b = 4.944;
-  let Y = m * textHeight + b;
-  Y = Math.max(Y, -65);
+//   doc.translate(centerX, centerY);
+//   doc.rotate(90);
 
 
-  console.log('textHeight', textHeight);
-  console.log('Y', Y);
+//   // if (textHeight < 15) {
+//   //   Y = 0
+//   // } else if (textHeight < 25) {
+//   //   Y = -5
+//   // } else if (textHeight < 57) {
+//   //   Y = -15
+//   // } else if (textHeight < 110) {
+//   //   Y = -30
+//   // } else if(textHeight < 150) {
+//   //   Y = -45
+//   // } else if (textHeight < 200) {
+//   //   Y = -60
+//   // } else {
+//   //    Y = -70
+//   // } 
 
-  // Write content to PDF
-  doc.text(req.body.message, -centerY, Y, {
-    width: docHeight,
-    align: "center"
-  });
+//   const m = -0.353;
+//   const b = 4.944;
+//   let Y = m * textHeight + b;
+//   Y = Math.max(Y, -65);
+
+
+//   console.log('textHeight', textHeight);
+//   console.log('Y', Y);
+
+//   // Write content to PDF
+//   doc.text(req.body.message, -centerY, Y, {
+//     width: docHeight,
+//     align: "center"
+//   });
   
-  // Finalize PDF file
-  doc.end();
+//   // Finalize PDF file
+//   doc.end();
 
-  // Convert PDF stream to a buffer
-  const buffer = await getStream.buffer(doc);
+//   // Convert PDF stream to a buffer
+//   const buffer = await getStream.buffer(doc);
 
-  // Send a response with the PDF buffer
-  res.writeHead(200, {
-    'Content-Type': 'application/pdf',
-    'Content-Disposition': 'attachment;filename=gift_message.pdf',
-    'Content-Length': buffer.length,
-  });
+//   // Send a response with the PDF buffer
+//   res.writeHead(200, {
+//     'Content-Type': 'application/pdf',
+//     'Content-Disposition': 'attachment;filename=gift_message.pdf',
+//     'Content-Length': buffer.length,
+//   });
 
-  res.end(buffer);
-});
+//   res.end(buffer);
+// });
 
 // Start the server
 app.listen(port, () => {

@@ -1,31 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import StartEndTimePicker from '../../componants/StartEndTimePicker';
-import OrderLineItem from './OrderLineItem';
 import { getOrderStatus } from '../../bigCommerce/orders/orders.get';
 import { setOrderStatuses } from '../../redux/bigCommerce/ordersSlice';
 import {
-  Autocomplete,
-  TextField,
   Grid,
-  Table,
-  TableBody,
   TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Button,
+  Modal,
   Accordion, AccordionSummary, AccordionDetails, Box, Typography
 } from '@mui/material';
 import moment from 'moment';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import PrintPreview from '../../componants/PrintPreview';
 
 export default function OrderIndex() {
   const orders = useSelector((state) => state.orders.orders);
   const dispatch = useDispatch();
-  const [selectedPrinter, setSelectedPrinter] = useState('');
-  const [printers, setPrinters] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState('');
   const [expanded, setExpanded] = useState(null);
+  const [preview, setPreview] = useState(false);
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     handleGetOrderStatus();
@@ -46,33 +42,14 @@ export default function OrderIndex() {
   }
 
   const printOrder = async (text) => {
-    try {
-      const response = await fetch('/create-pdf', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: text }),
-      });
-      
-      console.log('response', response);
-      if (response.ok) {
-        
-        const blob = await response.blob();
-        const printWindow = window.open(URL.createObjectURL(blob), '_blank');
-        printWindow.focus();
-        // In some browsers you may have to add a delay for the blob to be ready
-        setTimeout(() => {
-          printWindow.print();
-          // You might need to close the window after a delay as well
-        }, 500);
-      } else {
-        console.error('Failed to create PDF');
-      }
-    } catch (error) {
-      console.error('Error printing order:', error);
-    }
+    setPreview(true);
+    setMessage(text);
   };
+
+  const closePreviewModal = () => {
+    setPreview(false);
+    setMessage(null);
+  }
 
   return (
     <div>
@@ -192,6 +169,7 @@ export default function OrderIndex() {
           </Accordion>
         ))}
       </Box>
+      {preview && <PrintPreview text={message} closePreview={closePreviewModal} />}
     </div>
   );
 }
