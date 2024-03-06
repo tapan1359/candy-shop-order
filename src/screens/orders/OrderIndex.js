@@ -1,49 +1,66 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import StartEndTimePicker from '../../componants/StartEndTimePicker';
-import { getOrderStatus } from '../../bigCommerce/orders/orders.get';
-import { setOrderStatuses } from '../../redux/bigCommerce/ordersSlice';
+import { useDispatch } from 'react-redux';
 import {
   Grid,
-  TableCell,
+  FormControl, InputLabel, Select, MenuItem,
   Button,
   TextField,
-  Accordion, AccordionSummary, AccordionDetails, Box, Typography, Divider
+  Accordion, AccordionSummary, AccordionDetails, Box, Typography, Divider,
+  CircularProgress,
 } from '@mui/material';
 import moment from 'moment';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import PrintPreview from '../../componants/PrintPreview';
 import { getOrders } from '../../bigCommerce/orders/orders.get';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 
 export default function OrderIndex() {
-  const dispatch = useDispatch();
 
   const [orders, setOrders] = useState([]);
 
   const [expanded, setExpanded] = useState(null);
   const [preview, setPreview] = useState(false);
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
-
+  const [filterParams, setFilterParams] = useState({
+    startDate: moment().subtract(1, 'week'),
+    endDate: moment(),
+    status: '',
+    email: '',
+    minId: '',
+    maxId: '',
+    page: 1,
+    limit: 50
+  });
   const [orderFilters, setOrderFilters] = useState({});
 
 
   useEffect(() => {
-    handleGetOrderStatus();
-  }, []);
-
-  useEffect(() => {
     const getOrdersfromAPI = async () => {
-      const orders = await getOrders(orderFilters);
-      setOrders(orders);
-    }
+      try {
+        setLoading(true);
+        const orders = await getOrders({ params: orderFilters });
+        setOrders(orders);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
     getOrdersfromAPI();
   }, [orderFilters]);
 
-  const handleGetOrderStatus = async () => {
-    const orderStatus = await getOrderStatus();
-    dispatch(setOrderStatuses(orderStatus));
-  };
+  useEffect(() => {
+    applyFilters();
+  }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [filterParams.page, filterParams.limit]);
 
   const getShipping = (order) =>  {
     const shipping = order.consignments.map((consignment) => {
@@ -53,12 +70,6 @@ export default function OrderIndex() {
     }).filter((item) => item !== undefined).flat();
     return shipping;
   }
-
-  const handleFilterChange = (data) => {
-    if (data.startDate && data.endDate) {
-      setOrderFilters({...orderFilters, min_date_created: data.startDate, max_date_created: data.endDate});
-    }
-  };
 
   const printOrder = async (text) => {
     setPreview(true);
@@ -70,14 +81,163 @@ export default function OrderIndex() {
     setMessage(null);
   }
 
+  const handleDateChange = (value, name) => {
+    setFilterParams({ ...filterParams, [name]: value });
+  };
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilterParams(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Function to apply the filters
+  const applyFilters = () => {
+    const filters = {
+      ...(filterParams.startDate && { min_date_created: filterParams.startDate instanceof moment ? filterParams.startDate.toISOString() : filterParams.startDate }),
+      ...(filterParams.endDate && { max_date_created: filterParams.endDate instanceof moment ? filterParams.endDate.toISOString() : filterParams.endDate }),
+      ...(filterParams.status && { status_id: filterParams.status }),
+      ...(filterParams.email && { email: filterParams.email }),
+      ...(filterParams.minId && { min_id: filterParams.minId }),
+      ...(filterParams.maxId && { max_id: filterParams.maxId }),
+      page: filterParams.page,
+      limit: filterParams.limit,
+    };
+    setOrderFilters(filters);
+  };
+
+  const resetFilters = () => {
+    setFilterParams({
+      startDate: moment().subtract(1, 'week'),
+      endDate: moment(),
+      status: '',
+      email: '',
+      minId: '',
+      maxId: '',
+      page: 1,
+      limit: 50
+    });
+  }
+
   return (
     <div>
-      <Box sx={{ margin: 2, flexDirection: { xs: 'column', sm: 'row' }, display: 'flex', gap: 2 }}>
-        <Box sx={{ width: '100%', maxWidth: { sm: 'none', xs: '100%' } }}>
-          <StartEndTimePicker handleDateChange={handleFilterChange} />
-        </Box>
-      </Box>
+      <Accordion>
+        <AccordionSummary
+          expandIcon={<FilterListIcon />}
+          aria-controls="panel1a-content"
+          id="panel1a-header"
+        >
+          <Typography>Filter Orders</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6} md={3}>
+              <LocalizationProvider dateAdapter={AdapterMoment}>
+                <DatePicker
+                  label="Start Date"
+                  value={filterParams.startDate}
+                  onChange={(newValue) => handleDateChange(newValue, 'startDate')}
+                  renderInput={(params) => <TextField {...params} fullWidth size='small' />}
+                />
+              </LocalizationProvider>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <LocalizationProvider dateAdapter={AdapterMoment}>
+                <DatePicker
+                  label="End Date"
+                  value={filterParams.endDate}
+                  onChange={(newValue) => handleDateChange(newValue, 'endDate')}
+                  renderInput={(params) => <TextField {...params} fullWidth size='small' />}
+                />
+              </LocalizationProvider>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <FormControl fullWidth size="small">
+                <InputLabel id="status-label">Status</InputLabel>
+                <Select
+                  labelId="status-label"
+                  id="status"
+                  value={filterParams.status}
+                  onChange={handleFilterChange}
+                  label="Status"
+                  name="status"
+                >
+                  <MenuItem value=""><em>None</em></MenuItem>
+                  <MenuItem value="0">Incomplete</MenuItem>
+                  <MenuItem value="1">Pending</MenuItem>
+                  <MenuItem value="2">Shipped</MenuItem>
+                  <MenuItem value="3">Partially Shipped</MenuItem>
+                  <MenuItem value="4">Refunded</MenuItem>
+                  <MenuItem value="5">Cancelled</MenuItem>
+                  <MenuItem value="6">Declined</MenuItem>
+                  <MenuItem value="7">Awaiting Payment</MenuItem>
+                  <MenuItem value="8">Awaiting Pickup</MenuItem>
+                  <MenuItem value="9">Awaiting Shipment</MenuItem>
+                  <MenuItem value="10">Completed</MenuItem>
+                  <MenuItem value="11">Awaiting Fulfillment</MenuItem>
+                  <MenuItem value="12">Manual Verification Required</MenuItem>
+                  <MenuItem value="13">Disputed</MenuItem>
+                  <MenuItem value="14">Partially Refunded</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <TextField
+                fullWidth
+                label="Email"
+                variant="outlined"
+                size="small"
+                name="email"
+                value={filterParams.email}
+                onChange={handleFilterChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <TextField
+                fullWidth
+                label="Min ID"
+                variant="outlined"
+                size="small"
+                name="minId"
+                value={filterParams.minId}
+                onChange={handleFilterChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <TextField
+                fullWidth
+                label="Max ID"
+                variant="outlined"
+                size="small"
+                name="maxId"
+                value={filterParams.maxId}
+                onChange={handleFilterChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Button 
+                variant="contained" 
+                onClick={applyFilters} 
+                size="small"
+                fullWidth
+              >
+                Apply Filters
+              </Button>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Button 
+                variant="contained" 
+                onClick={resetFilters} 
+                size="small"
+                fullWidth
+              >
+                Reset
+              </Button>
+            </Grid>
+          </Grid>
+        </AccordionDetails>
+      </Accordion>
       <Divider />
+      {loading ? <CircularProgress /> : (
       <Box
         sx={{
           display: 'flex',
@@ -199,7 +359,18 @@ export default function OrderIndex() {
             </AccordionDetails>
           </Accordion>
         ))}
+        
+        <Grid container spacing={2} justifyContent="center" sx={{ marginTop: 2 }}>
+          <Button onClick={() => setFilterParams(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))} disabled={filterParams.page === 1}>
+            Previous
+          </Button>
+          <Typography>Page {filterParams.page}</Typography>
+          <Button onClick={() => setFilterParams(prev => ({ ...prev, page: prev.page + 1 }))}>
+            Next
+          </Button>
+        </Grid>
       </Box>
+      )}
       {preview && <PrintPreview text={message} closePreview={closePreviewModal} />}
     </div>
   );
