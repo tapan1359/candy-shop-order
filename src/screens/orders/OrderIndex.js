@@ -7,8 +7,8 @@ import {
   Grid,
   TableCell,
   Button,
-  Modal,
-  Accordion, AccordionSummary, AccordionDetails, Box, Typography
+  TextField,
+  Accordion, AccordionSummary, AccordionDetails, Box, Typography, Divider
 } from '@mui/material';
 import moment from 'moment';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -22,6 +22,7 @@ export default function OrderIndex() {
   const [expanded, setExpanded] = useState(null);
   const [preview, setPreview] = useState(false);
   const [message, setMessage] = useState('');
+  const [printMessage, setPrintMessage] = useState('');
 
   useEffect(() => {
     handleGetOrderStatus();
@@ -46,6 +47,11 @@ export default function OrderIndex() {
     setMessage(text);
   };
 
+  const printJustAMessage = () => {
+    setPreview(true);
+    setMessage(printMessage);
+  }
+
   const closePreviewModal = () => {
     setPreview(false);
     setMessage(null);
@@ -57,7 +63,24 @@ export default function OrderIndex() {
         <Grid item xs={6}>
           <StartEndTimePicker />
         </Grid>
+        <Box
+          sx={{
+            alignItems: 'center',
+            marginTop: 3,
+          }}
+        >
+          <TextField
+            id="outlined-basic"
+            label="Message to Print"
+            variant="outlined"
+            value={printMessage}
+            size='small'
+            onChange={(e) => setPrintMessage(e.target.value)}
+          />
+          <Button onClick={() => printJustAMessage()}>Print</Button>
+        </Box>
       </Grid>
+      <Divider />
       <Box
         sx={{
           display: 'flex',

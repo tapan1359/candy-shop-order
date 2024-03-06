@@ -36,45 +36,48 @@ export default function StartEndTimePicker() {
     // the style should be a box with a title and then a date picker for start and end date
     // both boxes should be side by side with buttonr on the side to reset the dates to the current date
     <Box sx={{
-      display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', height: '100px', border: '1px solid black',
+      display: 'flex', 
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      width: '60%', 
+      height: '50px',
     }}
     >
-      <Box sx={{
-        display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '50%', height: '100%',
-      }}
-      >
-        <Typography variant="h6">Start Date</Typography>
+      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+        <Typography variant="body2">Start Date</Typography>
         <DatePicker
-          selected={startDate}
-          selectsStart
-          startDate={startDate}
-          endDate={endDate}
-          onChange={(date) => setStartDate(date)}
-          wrapperClassName="date-picker"
+        selected={startDate}
+        selectsStart
+        startDate={startDate}
+        endDate={endDate}
+        onChange={(date) => setStartDate(date)}
+        wrapperClassName="date-picker"
         />
       </Box>
-      <Box sx={{
-        display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '50%', height: '100%',
-      }}
-      >
-        <Typography variant="h6">End Date</Typography>
+      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+        <Typography variant="body2">End Date</Typography>
         <DatePicker
-          selected={endDate}
-          selectsEnd
-          startDate={startDate}
-          endDate={endDate}
-          minDate={startDate}
-          onChange={(date) => setEndDate(date)}
+        selected={endDate}
+        selectsEnd
+        startDate={startDate}
+        endDate={endDate}
+        minDate={startDate}
+        onChange={(date) => setEndDate(date)}
         />
-      </Box>
-      {/* this is where the button to reset goes */}
-      <Box sx={{
-        display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '50%', height: '100%',
-      }}
-      >
-        <Button variant="contained" onClick={handleResetDates}>Reset Dates</Button>
       </Box>
 
+      <Button 
+        variant="contained" 
+        onClick={handleResetDates}
+        size='small'
+        sx={{
+          width: '70px',
+          height: '30px',
+          marginLeft: '10px',
+          marginTop: '10px',
+        }}
+      >
+        Reset</Button>
     </Box>
-  );
+  ); // Add closing parenthesis here
 }
