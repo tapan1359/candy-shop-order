@@ -58,6 +58,7 @@ export default function AddressForm({ title, addresses, address, setAddress }) {
         flexDirection: 'column',
         alignItems: 'center',
         gap: 2,
+        p: 1
       }}
     >
         <Typography variant="subtitle1">{title}</Typography>
@@ -79,7 +80,7 @@ export default function AddressForm({ title, addresses, address, setAddress }) {
           margin="normal"
           size={"small"}
           value={address}
-          sx={{ width: 400 }}
+          sx={{ width: '100%', maxWidth: '400px' }}
         />
         
         {(address && address.first_name !== '') && (
@@ -106,18 +107,19 @@ export default function AddressForm({ title, addresses, address, setAddress }) {
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <Box
           sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'background.paper',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: { xs: '90%', sm: 400 }, // Responsive width
+            bgcolor: 'background.paper',
             borderRadius: '8px',
             boxShadow: 24,
             p: 4,
-            top: '50%',
-            left: '50%',
-            width: 400,
-            transform: 'translate(80%, 30%)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           <FormControl fullWidth margin="normal">

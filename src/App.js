@@ -23,7 +23,6 @@ Amplify.configure({
   }
 });
 
-
 export const theme = createTheme({
   palette: {
     mode: 'light',
@@ -37,6 +36,9 @@ export const theme = createTheme({
   typography: {
     fontFamily: 'monospace',
     fontSize: 11,
+    '@media (max-width: 600px)': {
+      fontSize: 9,
+    },
   },    
 });
 
@@ -80,7 +82,7 @@ function App() {
             <Box sx={{ height: '64px' }} />
             {activePage === 'Orders' && <OrderIndex />}
             {activePage === 'New Orders' && <NewOrderIndex />}
-            {activePage === 'Update Data' && <UpdateDataScreen />}
+            {activePage === 'Misc' && <UpdateDataScreen />}
           </>
         ):
           <LoginPage />

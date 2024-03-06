@@ -10,7 +10,9 @@ import {
   TableHead,
   TableRow,
   TextField,
-  Typography
+  Typography,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -35,6 +37,8 @@ const priceWithTax = (price, quantity, tax) => {
 
 export default function Shipping({addresses, products, consignment, updateConsignmentShippingAddress, updateConsignmentItems, removeConsignment}) {
 
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.down('sm'));
   const [modalOpen, setModalOpen] = useState(false);
   const [modelItem, setModelItem] = useState(createDefaultLineItem());
 
@@ -90,27 +94,29 @@ export default function Shipping({addresses, products, consignment, updateConsig
   return (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
+        flexDirection: { xs: 'column', md: 'row' }, // Stack vertically on small screens
         boxShadow: 2,
         borderRadius: '8px',
         p: 2,
         gap: 3,
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
       }}
     >
-      <Box>
+      <Box flex={1} sx={{width: "100%"}} > 
         <AddressForm title={"Shipping"} addresses={addresses} address={consignment.address} setAddress={setShippingAddress} />
       </Box>
-      <Divider orientation={"vertical"} flexItem />
-      <Box
+      {matches ? <Divider sx={{ my: 2 }} /> : <Divider orientation="vertical" flexItem />}
+      <Box 
+        flex={2}
         sx={{
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
           gap: 2,
+          width: '100%',
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2}}>
@@ -170,19 +176,20 @@ export default function Shipping({addresses, products, consignment, updateConsig
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <Box
           sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'background.paper',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: { xs: '90%', sm: 400 }, // Responsive width
+            bgcolor: 'background.paper',
             borderRadius: '8px',
             boxShadow: 24,
             p: 4,
-            top: '50%',
-            left: '50%',
-            width: 400,
-            transform: 'translate(80%, 50%)',
-            gap: 2
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 2,
           }}
         >          
           <Autocomplete

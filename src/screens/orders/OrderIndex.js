@@ -13,20 +13,32 @@ import {
 import moment from 'moment';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import PrintPreview from '../../componants/PrintPreview';
+import { getOrders } from '../../bigCommerce/orders/orders.get';
 
 export default function OrderIndex() {
-  const orders = useSelector((state) => state.orders.orders);
   const dispatch = useDispatch();
-  const [modalOpen, setModalOpen] = useState(false);
-  const [pdfUrl, setPdfUrl] = useState('');
+
+  const [orders, setOrders] = useState([]);
+
   const [expanded, setExpanded] = useState(null);
   const [preview, setPreview] = useState(false);
   const [message, setMessage] = useState('');
-  const [printMessage, setPrintMessage] = useState('');
+
+
+  const [orderFilters, setOrderFilters] = useState({});
+
 
   useEffect(() => {
     handleGetOrderStatus();
   }, []);
+
+  useEffect(() => {
+    const getOrdersfromAPI = async () => {
+      const orders = await getOrders(orderFilters);
+      setOrders(orders);
+    }
+    getOrdersfromAPI();
+  }, [orderFilters]);
 
   const handleGetOrderStatus = async () => {
     const orderStatus = await getOrderStatus();
@@ -42,15 +54,16 @@ export default function OrderIndex() {
     return shipping;
   }
 
+  const handleFilterChange = (data) => {
+    if (data.startDate && data.endDate) {
+      setOrderFilters({...orderFilters, min_date_created: data.startDate, max_date_created: data.endDate});
+    }
+  };
+
   const printOrder = async (text) => {
     setPreview(true);
     setMessage(text);
   };
-
-  const printJustAMessage = () => {
-    setPreview(true);
-    setMessage(printMessage);
-  }
 
   const closePreviewModal = () => {
     setPreview(false);
@@ -59,33 +72,24 @@ export default function OrderIndex() {
 
   return (
     <div>
-      <Grid container spacing={2} margin={2}>
-        <Grid item xs={6}>
-          <StartEndTimePicker />
-        </Grid>
-        <Box
-          sx={{
-            alignItems: 'center',
-            marginTop: 3,
-          }}
-        >
-          <TextField
-            id="outlined-basic"
-            label="Message to Print"
-            variant="outlined"
-            value={printMessage}
-            size='small'
-            onChange={(e) => setPrintMessage(e.target.value)}
-          />
-          <Button onClick={() => printJustAMessage()}>Print</Button>
+      <Box sx={{ margin: 2, flexDirection: { xs: 'column', sm: 'row' }, display: 'flex', gap: 2 }}>
+        <Box sx={{ width: '100%', maxWidth: { sm: 'none', xs: '100%' } }}>
+          <StartEndTimePicker handleDateChange={handleFilterChange} />
         </Box>
-      </Grid>
+      </Box>
       <Divider />
       <Box
         sx={{
           display: 'flex',
           flexDirection: 'column',
           paddingLeft: 2,
+          '& .MuiAccordionSummary-content': {
+            justifyContent: 'space-between',
+          },
+          '& .MuiTableCell-root': {
+            fontSize: { xs: '0.75rem', sm: '1rem' }, // smaller font size on xs screens
+            padding: '6px 8px', // reduced padding
+          },
         }}
       >
         {orders && orders?.map((order) => (
@@ -94,19 +98,23 @@ export default function OrderIndex() {
               <Box
                 sx={{
                   display: 'flex',
-                  flexDirection: 'row',
+                  flexDirection: { xs: 'column', sm: 'row' },
                   justifyContent: 'space-between',
-                  alignItems: 'center',
-                  width: '100%',
+                  alignItems: { sm: 'center' },
+                  gap: { xs: 0.5, sm: 2, md: 5 },
                 }}
               >
-                <TableCell>{order.id}</TableCell>
-                <TableCell>
+                <Typography>{order.id}</Typography>
+                <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', sm: 'block' } }} />
+                <Typography noWrap>
                   {order.billing_address.first_name} {order.billing_address.last_name}
-                </TableCell>
-                <TableCell>${order.total_inc_tax}</TableCell>
-                <TableCell>{order.status}</TableCell>
-                <TableCell>{moment(order.date_created).format('MM/DD/YYYY')}</TableCell>
+                </Typography>
+                <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', sm: 'block' } }} />
+                <Typography>${order.total_inc_tax}</Typography>
+                <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', sm: 'block' } }} />
+                <Typography>{order.status}</Typography>
+                <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', sm: 'block' } }} />
+                <Typography>{moment(order.date_created).format('MM/DD/YYYY')}</Typography>
               </Box>
             </AccordionSummary>
             <AccordionDetails>

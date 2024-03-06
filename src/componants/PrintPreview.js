@@ -63,19 +63,21 @@ const PrintPreview = ({text, closePreview}) => {
       <Modal open>
         <Box
           sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'background.paper',
-            borderRadius: '8px',
-            boxShadow: 24,
-            p: 4,
+            position: 'absolute',
             top: '50%',
             left: '50%',
-            width: 500,
-            height: 600,
-            transform: 'translate(80%, 30%)',
+            transform: 'translate(-50%, -50%)',
+            width: { xs: '90%', sm: 400 }, // Responsive width
+            bgcolor: 'background.paper',
+            borderRadius: '8px',
+            boxShadow: 24,
+            paddingLeft: 0,
+            paddingRight: 0,
+            paddingTop: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
             <div>

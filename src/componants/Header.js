@@ -13,7 +13,7 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 
-const pages = ['Orders', 'New Orders', 'Update Data', 'Logout'];
+const pages = ['Orders', 'New Orders', 'Misc', 'Logout'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 function Header({ activePage, hndlePageChange }) {
@@ -70,7 +70,10 @@ function Header({ activePage, hndlePageChange }) {
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page}>
+                <MenuItem 
+                  key={page}
+                  onClick={() => hndlePageChange(page)}
+                >
                   <Typography textAlign="center" color={activePage === page ? 'primary' : 'inherit'}>{page}</Typography>
                 </MenuItem>
               ))}

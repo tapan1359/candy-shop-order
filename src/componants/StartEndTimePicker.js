@@ -7,43 +7,39 @@ import { getOrders } from '../bigCommerce/orders/orders.get';
 import { setOrders } from '../redux/bigCommerce/ordersSlice';
 import '../styles/StartEndTimePicker.css';
 
-export default function StartEndTimePicker() {
+export default function StartEndTimePicker({handleDateChange}) {
   const [startDate, setStartDate] = useState(new Date('2024-02-06')); // this is the start date for the picker
   const [endDate, setEndDate] = useState(new Date());
   const orders = useSelector((state) => state.orders.orders);
-  const dispatch = useDispatch();
 
   useEffect(() => {
-    getOrdersByDate();
+    handleDateChange({startDate, endDate});
   }, [startDate, endDate]);
 
-  const getOrdersByDate = async () => {
-    const orders = await getOrders({
-      params: {
-        min_date_created: startDate,
-        max_date_created: endDate,
-      },
-    });
-    dispatch(setOrders(orders));
-  };
 
   const handleResetDates = () => {
     setStartDate(new Date());
     setEndDate(new Date());
   };
   return (
-    // the goal is to have a start date and end date that can be selected and then used to filter the orders
-    // the style should be a box with a title and then a date picker for start and end date
-    // both boxes should be side by side with buttonr on the side to reset the dates to the current date
     <Box sx={{
       display: 'flex', 
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      width: '60%', 
+      flexDirection: { xs: 'column', sm: 'row' },
+      justifyContent: 'space-around',
+      alignItems: 'center',
+      width: '100%', 
       height: '50px',
+      '& > *': {
+        marginBottom: { xs: 1, sm: 0}
+      }
     }}
     >
-      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          flexDirection: 'row',
+          width: {xs: '100%', sm: 'auto'}
+        }}>
         <Typography variant="body2">Start Date</Typography>
         <DatePicker
         selected={startDate}
@@ -54,7 +50,12 @@ export default function StartEndTimePicker() {
         wrapperClassName="date-picker"
         />
       </Box>
-      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          flexDirection: 'row',
+          width: {xs: '100%', sm: 'auto'}
+        }}>
         <Typography variant="body2">End Date</Typography>
         <DatePicker
         selected={endDate}
@@ -64,20 +65,14 @@ export default function StartEndTimePicker() {
         minDate={startDate}
         onChange={(date) => setEndDate(date)}
         />
-      </Box>
-
-      <Button 
-        variant="contained" 
-        onClick={handleResetDates}
-        size='small'
-        sx={{
-          width: '70px',
-          height: '30px',
-          marginLeft: '10px',
-          marginTop: '10px',
-        }}
-      >
-        Reset</Button>
+        <Button 
+          variant="contained" 
+          onClick={handleResetDates}
+          size='small'
+        >
+         Reset
+        </Button>
     </Box>
-  ); // Add closing parenthesis here
+      </Box>
+  );
 }
