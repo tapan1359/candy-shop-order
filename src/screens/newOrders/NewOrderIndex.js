@@ -370,7 +370,7 @@ export default function NewOrderIndex() {
                 size={"large"}
                 onClick={handlePickupCart}
               >
-                {loading ? "Loading..." : "Create Cart and Get Shipping Options"}
+                {loading ? "Loading..." : "Create Cart"}
               </Button>
             </>  
           )}
