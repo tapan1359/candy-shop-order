@@ -34,7 +34,8 @@ export default function OrderIndex() {
     minId: '',
     maxId: '',
     page: 1,
-    limit: 50
+    limit: 50,
+    sort: 'date_created:desc'
   });
   const [orderFilters, setOrderFilters] = useState({});
 
@@ -101,6 +102,7 @@ export default function OrderIndex() {
       ...(filterParams.maxId && { max_id: filterParams.maxId }),
       page: filterParams.page,
       limit: filterParams.limit,
+      sort: filterParams.sort,
     };
     setOrderFilters(filters);
   };
@@ -114,7 +116,8 @@ export default function OrderIndex() {
       minId: '',
       maxId: '',
       page: 1,
-      limit: 50
+      limit: 50,
+      sort: 'date_created:desc'
     });
   }
 

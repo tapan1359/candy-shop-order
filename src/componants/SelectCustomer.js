@@ -1,23 +1,163 @@
 import React from 'react';
-import {TextField, Autocomplete} from '@mui/material';
+import {TextField, Autocomplete, Button, Modal, Box, FormControl, Alert} from '@mui/material';
+import {createCustomerAPI} from '../bigCommerce/customers/customers.create';
+
+
+const createCustomerModel =  () => {
+  return {
+    first_name: '',
+    last_name: '',
+    phone: '',
+    email: '',
+  }
+}
 
 
 export default function SelectCustomer({customers, customer, setCustomer}) {
+
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const [newCustomer, setNewCustomer] = React.useState(createCustomerModel());
+  const [error, setError] = React.useState(null);
 
   const handleCustomerSelect = (customer) => {
     setCustomer(customer);
   }
 
+  const handleCreateNewCustomer = (e) => {
+    setNewCustomer({ ...newCustomer, [e.target.name]: e.target.value });
+  }
+
+  const createNewCustomer = async () => {
+    if (newCustomer.first_name === '' || newCustomer.last_name === '' || newCustomer.phone === '' || newCustomer.email === '') {
+      return;
+    }
+    let {customer, error} = await createCustomerAPI(newCustomer);
+    if (customer) {
+      setCustomer(customer);
+      setModalOpen(false);
+    } if (error) {
+      setError(error);
+    } else {
+      setError("Unknown error!")
+    }
+  }
+
   return (
-    <Autocomplete
-      fullWidth
-      id="combo-box-demo"
-      options={customers}
-      value={customer}
-      getOptionLabel={(option) => `${option.first_name}, ${option.last_name}`}
-      renderInput={(params) => <TextField {...params} label="Search by customer Name/Phone Number" />}
-      onChange={(event, newValue) => handleCustomerSelect(newValue)}
-      filterOptions={(options, state) => options.filter((option) => option.first_name.toLowerCase().includes(state.inputValue.toLowerCase()) || option.last_name.toLowerCase().includes(state.inputValue.toLowerCase()) || option.phone.toLowerCase().includes(state.inputValue.toLowerCase()) || option.email.toLowerCase().includes(state.inputValue.toLowerCase()))}
-    />
+    <>
+      {error && (
+        <Alert
+          severity="error"
+          onClose={() => setError(null)}
+          sx={{
+            position: 'fixed',
+            top: '16px',
+            right: '16px',
+            zIndex: 9999,
+          }}
+        >
+          {error}
+        </Alert>
+      )}
+      <Autocomplete
+        fullWidth
+        id="combo-box-demo"
+        options={customers}
+        value={customer}
+        getOptionLabel={(option) => `${option.first_name}, ${option.last_name}`}
+        renderInput={(params) => <TextField {...params} label="Search by customer Name/Phone Number" />}
+        onChange={(event, newValue) => handleCustomerSelect(newValue)}
+        filterOptions={(options, state) => options.filter((option) => option.first_name.toLowerCase().includes(state.inputValue.toLowerCase()) || option.last_name.toLowerCase().includes(state.inputValue.toLowerCase()) || option.phone.toLowerCase().includes(state.inputValue.toLowerCase()) || option.email.toLowerCase().includes(state.inputValue.toLowerCase()))}
+        noOptionsText={
+          <Button color="primary" onClick={() => setModalOpen(true)}>
+            Not Found. Add New Customer
+          </Button>
+        }
+      />
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: { xs: '90%', sm: 400 }, // Responsive width
+            bgcolor: 'background.paper',
+            borderRadius: '8px',
+            boxShadow: 24,
+            p: 4,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <FormControl fullWidth margin="normal">
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                gap: '10px',
+              }}
+            >
+              <TextField
+                required
+                id="first_name"
+                name="first_name"
+                label="First name"
+                fullWidth
+                value={newCustomer.first_name}
+                onChange={handleCreateNewCustomer}
+                margin="normal"
+                size={"small"}
+              />
+
+              <TextField
+                required
+                id="last_name"
+                name="last_name"
+                label="Last name"
+                fullWidth
+                value={newCustomer.last_name}
+                onChange={handleCreateNewCustomer}
+                margin="normal"
+                size={"small"}
+              />
+            </div>
+
+
+            <TextField
+              required
+              id="phone"
+              name="phone"
+              label="Phone Number"
+              fullWidth
+              value={newCustomer.phone}
+              onChange={handleCreateNewCustomer}
+              margin="normal"
+              size={"small"}
+            />
+            <TextField
+              required
+              id="email"
+              name="email"
+              label="Email"
+              fullWidth
+              value={newCustomer.email}
+              onChange={handleCreateNewCustomer}
+              margin="normal"
+              size={"small"}
+            />
+            <Button
+              onClick={() => createNewCustomer()}
+              size={"small"}
+              variant={"outlined"}
+            >
+              Create New customer
+            </Button>
+          </FormControl>
+        </Box>
+      </Modal>
+    </>
   )
 }

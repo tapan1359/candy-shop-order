@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Alert,
   Box,
@@ -23,6 +23,7 @@ import {ShippingOptions} from "../../componants/ShippingOptions";
 import {processOrderPayment} from "../../bigCommerce/payment/payments";
 import { setCart, setOrder, setCheckout } from '../../redux/bigCommerce/newOrderSlice';
 import FloatOrderDetails from '../../componants/floatOrderDetails';
+import CreateAddress from '../../componants/CreateAddress';
 
 
 const createDefaultConsignment = (id) => {
@@ -55,7 +56,9 @@ export default function NewOrderIndex() {
   const [paymentInfo, setPaymentInfo] = React.useState(null);
   
 
-
+  useEffect(() => {
+    console.log("Updated"); 
+  }, []);
 
   const resetPage = () => {
     setError(null);
@@ -261,12 +264,13 @@ export default function NewOrderIndex() {
           }}
         >
           <SelectCustomer customers={customers} customer={customer} setCustomer={setCustomer} />
+          <CreateAddress customerId={customer?.id} />
           <Button color={'error'} onClick={resetPage}>
             RESET
           </Button>
         </Box>
         <Divider />
-        <AddressForm title={"Billing Address"} addresses={customer?.addresses} address={billing} setAddress={setBilling} />
+        <AddressForm title={"Billing Address"} customerId={customer?.id} address={billing} setAddress={setBilling} />
         <Divider />
 
         <Typography variant="h6">Shipping Addresses</Typography>
@@ -283,7 +287,7 @@ export default function NewOrderIndex() {
           >
             <Shipping 
               key={consignment.internalId} 
-              addresses={customer?.addresses} 
+              customerId={customer?.id} 
               products={products} 
               consignment={consignment} 
               updateConsignmentShippingAddress={updateConsignmentShippingAddress}

@@ -18,6 +18,27 @@ export const getCustomers = async (params) => {
   return response.data;
 };
 
+export const getCustomerById = async (id) => {
+
+  let result = {
+    customer: null,
+    error: null,
+  };
+
+  try {
+    const response = await api_bigCommerce.get('/v3/customers', {
+      params: {
+        "id:in": id,
+        include: 'addresses',
+      },
+    });
+    result.customer = response.data.data[0];
+  } catch (error) {
+    result.error = JSON.stringify(error.response.data.errors);
+  }
+  return result;
+};
+
 export const getAllCustomers = async () => {
   let allCustomers = [];
   let hasMore = true;

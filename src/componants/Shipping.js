@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {useSelector} from 'react-redux';
 import AddressForm from "./AddressForm";
 import {
   Autocomplete,
@@ -35,12 +36,13 @@ const priceWithTax = (price, quantity, tax) => {
   return (totalPrice + calculatedTax).toFixed(2);
 }
 
-export default function Shipping({addresses, products, consignment, updateConsignmentShippingAddress, updateConsignmentItems, removeConsignment}) {
+export default function Shipping({customerId, products, consignment, updateConsignmentShippingAddress, updateConsignmentItems, removeConsignment}) {
 
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down('sm'));
   const [modalOpen, setModalOpen] = useState(false);
   const [modelItem, setModelItem] = useState(createDefaultLineItem());
+  const addresses = useSelector((state) => state.data.customers.find((c) => c.id === customerId)?.addresses);
 
   const setShippingAddress = (address) => {
     updateConsignmentShippingAddress(consignment.internalId, address);
