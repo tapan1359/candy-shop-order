@@ -15,6 +15,7 @@ import AdbIcon from '@mui/icons-material/Adb';
 
 const pages = ['Orders', 'New Orders', 'Misc', 'Logout'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const tag = process.env.REACT_APP_TAG;
 
 function Header({ activePage, hndlePageChange }) {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -90,6 +91,7 @@ function Header({ activePage, hndlePageChange }) {
               </Button>
             ))}
           </Box>
+          <Typography>{`v${tag}`}</Typography>
         </Toolbar>
       </Container>
     </AppBar>
