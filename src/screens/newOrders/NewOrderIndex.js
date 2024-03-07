@@ -24,6 +24,7 @@ import {processOrderPayment} from "../../bigCommerce/payment/payments";
 import { setCart, setOrder, setCheckout } from '../../redux/bigCommerce/newOrderSlice';
 import FloatOrderDetails from '../../componants/floatOrderDetails';
 import CreateAddress from '../../componants/CreateAddress';
+import CreateCustomer from '../../componants/CreateCustomer';
 
 
 const createDefaultConsignment = (id) => {
@@ -44,7 +45,6 @@ export default function NewOrderIndex() {
   const order = useSelector((state) => state.newOrders.order);
 
   const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState(null);
   const [customer, setCustomer] = React.useState(null);
   const [billing, setBilling] = React.useState(null);
   const [consignments, setConsignments] = React.useState([]);
@@ -56,9 +56,10 @@ export default function NewOrderIndex() {
   const [paymentInfo, setPaymentInfo] = React.useState(null);
   
   const [orderCreated, setOrderCreated] = React.useState(false);
+  const [alertMessage, setAlertMessage] = React.useState(null);
 
   const resetPage = () => {
-    setError(null);
+    setAlertMessage(null);
     setCustomer(null);
     setBilling(null);
     setConsignments([]);
@@ -68,9 +69,6 @@ export default function NewOrderIndex() {
     dispatch(setCart(null));
     dispatch(setOrder(null));
     dispatch(setCheckout(null));
-  }
-
-  const resetOrder = () => {
     setOrderId(null);
     setPaymentInfo(null);
     setOrderCreated(false);
@@ -124,10 +122,10 @@ export default function NewOrderIndex() {
 
     try {
       setLoading(true);
-      setError(null);
+      setAlertMessage(null);
 
       if (consignments.some((consignment) => !consignment.address || consignment.items.length === 0)) {
-        setError("Invalid consignments. check address and items.");
+        setAlertMessage({message: "Invalid consignments. check address and items.", severity: "error"});
         return
       }
 
@@ -146,6 +144,8 @@ export default function NewOrderIndex() {
         cartLineItems: cart.data.line_items
       });
 
+      setAlertMessage({message: "Cart and Consignments created!", severity: "success"});
+
       dispatch(setCheckout(consignmentResponse.data));
 
       // consignmentResponse.data.consignments.
@@ -155,7 +155,7 @@ export default function NewOrderIndex() {
 
     } catch (error) {
       const data = error.response.data;
-      setError(JSON.stringify(data?.title));
+      setAlertMessage({message: JSON.stringify(data?.title), severity: "error"});
       setLoading(false);
     } finally {
       setLoading(false);
@@ -166,10 +166,10 @@ export default function NewOrderIndex() {
 
     try {
       setLoading(true);
-      setError(null);
+      setAlertMessage(null);
 
       if (orderId) {
-        setError("Order already created!");
+        setAlertMessage({message: "Order already created!", severity: "error"});
         return;
       }
 
@@ -185,6 +185,7 @@ export default function NewOrderIndex() {
       setOrderId(responseOrderId);
       setOrderCreated(true);
       
+      setAlertMessage({message: "Order created!", severity: "success"});
       
       const order = await getOrder({orderId: responseOrderId});
       dispatch(setOrder(order));
@@ -192,7 +193,7 @@ export default function NewOrderIndex() {
 
     } catch (error) {
       const data = error.response.data;
-      setError(JSON.stringify(data?.title));
+      setAlertMessage({message: JSON.stringify(data?.title), severity: "error"});
       setLoading(false);
     }
     finally {
@@ -204,10 +205,10 @@ export default function NewOrderIndex() {
   const handlePayment = async () => {
     try {
       setLoading(true);
-      setError(null);
+      setAlertMessage(null);
       
       if (!orderId || !paymentInfo) {
-        setError("provide payment info!");
+        setAlertMessage({message: "provide payment info!", severity: "error"});
         return;
       }
 
@@ -215,13 +216,13 @@ export default function NewOrderIndex() {
         await processOrderPayment({orderId, paymentInfo});
       }
 
+      setAlertMessage({message: "Payment processed!", severity: "success"});
       setPaymentModalOpen(false);
-      resetOrder();
       resetPage();
 
     } catch (error) {
       const data = error.response.data;
-      setError(JSON.stringify(data?.title));
+      setAlertMessage({message: JSON.stringify(data?.title), severity: "error"});
       setLoading(false);
     }
     finally {
@@ -232,10 +233,10 @@ export default function NewOrderIndex() {
   return (
     <>
       <FloatOrderDetails />
-      {error && (
+      {alertMessage && (
         <Alert
-          severity="error"
-          onClose={() => setError(null)}
+          severity={alertMessage.severity}
+          onClose={() => setAlertMessage(null)}
           sx={{
             position: 'fixed',
             top: '16px',
@@ -243,7 +244,7 @@ export default function NewOrderIndex() {
             zIndex: 9999,
           }}
         >
-          {error}
+          {alertMessage.message}
         </Alert>
       )}
       <Box
@@ -258,12 +259,13 @@ export default function NewOrderIndex() {
         <Box
           sx={{
             display: 'flex',
-            flexDirection: 'row',
+            flexDirection: { xs: 'column', sm: 'row' },
             justifyContent: 'space-around',
           }}
         >
           <SelectCustomer customers={customers} customer={customer} setCustomer={setCustomer} />
           <CreateAddress customerId={customer?.id} />
+          <CreateCustomer setCustomer={setCustomer}/>
           <Button color={'error'} onClick={resetPage}>
             RESET
           </Button>
@@ -329,10 +331,10 @@ export default function NewOrderIndex() {
             <Divider />
             {/* You would replace the following with your actual order summary display */}
             <Typography variant="body1">Order ID: {orderId}</Typography>
-            <Typography variant="body1">Customer: {customer.first_name} {customer.last_name}</Typography>
-            <Typography variant="body1">Billing Address: {billing.address1}, {billing.city}</Typography>
-            <Typography variant="body1">Total: {order.total_inc_tax}</Typography>
-            <Typography variant="body1">Status: {order.status}</Typography>
+            <Typography variant="body1">Customer: {customer?.first_name} {customer?.last_name}</Typography>
+            <Typography variant="body1">Billing Address: {billing?.address1}, {billing?.city}</Typography>
+            <Typography variant="body1">Total: {order?.total_inc_tax}</Typography>
+            <Typography variant="body1">Status: {order?.status}</Typography>
           </Box>
         )}
         

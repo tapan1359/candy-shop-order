@@ -23,6 +23,7 @@ export default function CreateAddress({customerId}) {
   const [modalOpen, setModalOpen] = useState(false);
   const [address, setAddress] = useState(billingInfoEmpty);
   const [error, setError] = useState(null);
+  const [alertMessage, setAlertMessage] = React.useState(null);
   const dispatch = useDispatch();
 
   const handleUpdateField = (e) => {
@@ -32,7 +33,7 @@ export default function CreateAddress({customerId}) {
   const handleCreateAddress = async () => {
     setError(null);
     if (address.first_name === '' || address.last_name === '' || address.address1 === '' || address.city === '') {
-      setError("Please fill in all required fields - firstname, lastname, address1, city, postal_code");
+      setAlertMessage({severity: "error", message: "Please fill in all required fields - firstname, lastname, address1, city"});
       return;
     }
 
@@ -43,19 +44,20 @@ export default function CreateAddress({customerId}) {
       dispatch(updateCustomerById(r.customer));
       setAddress(null);
       setModalOpen(false);
+      setAlertMessage({severity: "success", message: "Address created successfully!"});
     } else if (result.error) {
-      setError(result.error);
+      setAlertMessage({severity: "error", message: JSON.stringify(result.error)});
     } else {
-      setError("Unknown error!")
+      setAlertMessage({severity: "error", message: "Unknown error!"});
     }
   }
 
   return (
     <>
-      {error && (
+      {alertMessage && (
         <Alert
-          severity="error"
-          onClose={() => setError(null)}
+          severity={alertMessage.severity}
+          onClose={() => setAlertMessage(null)}
           sx={{
             position: 'fixed',
             top: '16px',
@@ -63,7 +65,7 @@ export default function CreateAddress({customerId}) {
             zIndex: 9999,
           }}
         >
-          {error}
+          {alertMessage.message}
         </Alert>
       )}
     <Box
