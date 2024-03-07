@@ -79,6 +79,12 @@ export default function SelectCustomer({customers, customer, setCustomer}) {
         getOptionLabel={(option) => `${option.first_name}, ${option.last_name}`}
         renderInput={(params) => <TextField {...params} label="Search by customer Name/Phone Number" />}
         onChange={(event, newValue) => handleCustomerSelect(newValue)}
+        renderOption={(props, option) => (
+          // Here you need to ensure the key is unique for each option
+          <li {...props} key={option.id}>
+            {option.first_name}, {option.last_name}
+          </li>
+        )}
         filterOptions={(options, state) => options.filter((option) => option.first_name.toLowerCase().includes(state.inputValue.toLowerCase()) || option.last_name.toLowerCase().includes(state.inputValue.toLowerCase()) || option.phone.toLowerCase().includes(state.inputValue.toLowerCase()) || option.email.toLowerCase().includes(state.inputValue.toLowerCase()))}
         noOptionsText={
           <Button color="primary" onClick={() => setModalOpen(true)}>

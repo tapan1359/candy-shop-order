@@ -41,6 +41,7 @@ export default function CreateAddress({customerId}) {
     if (result.address) {
       let r = await getCustomerById(customerId);
       dispatch(updateCustomerById(r.customer));
+      setAddress(null);
       setModalOpen(false);
     } else if (result.error) {
       setError(result.error);
