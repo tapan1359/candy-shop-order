@@ -13,6 +13,9 @@ const dataSlice = createSlice({
     setProducts: (state, action) => {
       state.products = action.payload;
     },
+    addCustomer: (state, action) => {
+      state.customers.push(action.payload);
+    },
     updateCustomerById: (state, action) => {
       const customer = action.payload;
       const index = state.customers.findIndex((c) => c.id === customer.id);
@@ -23,6 +26,6 @@ const dataSlice = createSlice({
   },
 });
 
-export const { setCustomers, setProducts, updateCustomerById } = dataSlice.actions;
+export const { setCustomers, setProducts, updateCustomerById, addCustomer } = dataSlice.actions;
 
 export default dataSlice.reducer;

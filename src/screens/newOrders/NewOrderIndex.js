@@ -55,6 +55,7 @@ export default function NewOrderIndex() {
   const [paymentModalOpen, setPaymentModalOpen] = React.useState(false);
   const [paymentInfo, setPaymentInfo] = React.useState(null);
   
+  const [orderCreated, setOrderCreated] = React.useState(false);
 
   useEffect(() => {
     console.log("Updated"); 
@@ -76,6 +77,7 @@ export default function NewOrderIndex() {
   const resetOrder = () => {
     setOrderId(null);
     setPaymentInfo(null);
+    setOrderCreated(false);
   }
 
   const addConsignment = () => {
@@ -185,6 +187,7 @@ export default function NewOrderIndex() {
 
       const responseOrderId = await createOrder({checkoutId});
       setOrderId(responseOrderId);
+      setOrderCreated(true);
       
       
       const order = await getOrder({orderId: responseOrderId});
@@ -270,55 +273,73 @@ export default function NewOrderIndex() {
           </Button>
         </Box>
         <Divider />
-        <AddressForm title={"Billing Address"} customerId={customer?.id} address={billing} setAddress={setBilling} />
-        <Divider />
+        {!orderCreated && (
+          <>
+            <AddressForm title={"Billing Address"} customerId={customer?.id} address={billing} setAddress={setBilling} />
+          <Divider />
 
-        <Typography variant="h6">Shipping Addresses</Typography>
-        {consignments.map((consignment) => (
-          <Box
-            key={consignment.internalId}
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 2,
-              padding: 2,
-              borderRadius: 2,
-            }}
+          <Typography variant="h6">Shipping Addresses</Typography>
+          {consignments.map((consignment) => (
+            <Box
+              key={consignment.internalId}
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2,
+                padding: 2,
+                borderRadius: 2,
+              }}
+            >
+              <Shipping 
+                key={consignment.internalId} 
+                customerId={customer?.id} 
+                products={products} 
+                consignment={consignment} 
+                updateConsignmentShippingAddress={updateConsignmentShippingAddress}
+                updateConsignmentItems={updateConsignmentItems}
+                removeConsignment={removeConsignment} 
+              />
+            </Box>
+          ))}
+          <Button
+            onClick={addConsignment}
           >
-            <Shipping 
-              key={consignment.internalId} 
-              customerId={customer?.id} 
-              products={products} 
-              consignment={consignment} 
-              updateConsignmentShippingAddress={updateConsignmentShippingAddress}
-              updateConsignmentItems={updateConsignmentItems}
-              removeConsignment={removeConsignment} 
-            />
+            Add New Consignment
+          </Button>
+          <Divider />
+          <Button
+            size={"large"}
+            onClick={handleSubmit}
+            disabled={disableCreateCart()}
+          >
+            {loading ? "Loading..." : "Create Cart and Get Shipping Options"}
+          </Button>
+          <Divider />
+          <ShippingOptions APIConsignments={APIConsignments} setShippingOption={setShippingOption} />
+          <Divider />
+          <Button
+            size={"large"}
+            onClick={handleCreateOrder}
+            disabled={disableCreateOrder()}
+          >
+            {loading ? "Loading..." : "Create Order"}
+          </Button>
+          </>
+        )}
+
+        {orderCreated && (
+          <Box sx={{ padding: 2 }}>
+            <Typography variant="h4">Order Summary</Typography>
+            <Divider />
+            {/* You would replace the following with your actual order summary display */}
+            <Typography variant="body1">Order ID: {orderId}</Typography>
+            <Typography variant="body1">Customer: {customer.first_name} {customer.last_name}</Typography>
+            <Typography variant="body1">Billing Address: {billing.address1}, {billing.city}</Typography>
+            <Typography variant="body1">Total: {order.total_inc_tax}</Typography>
+            <Typography variant="body1">Status: {order.status}</Typography>
           </Box>
-        ))}
-        <Button
-          onClick={addConsignment}
-        >
-          Add New Consignment
-        </Button>
-        <Divider />
-        <Button
-          size={"large"}
-          onClick={handleSubmit}
-          disabled={disableCreateCart()}
-        >
-          {loading ? "Loading..." : "Create Cart and Get Shipping Options"}
-        </Button>
-        <Divider />
-        <ShippingOptions APIConsignments={APIConsignments} setShippingOption={setShippingOption} />
-        <Divider />
-        <Button
-          size={"large"}
-          onClick={handleCreateOrder}
-          disabled={disableCreateOrder()}
-        >
-          {loading ? "Loading..." : "Create Order"}
-        </Button>
+        )}
+        
         <Divider />
         <Button
           size={"large"}

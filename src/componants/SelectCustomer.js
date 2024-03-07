@@ -1,6 +1,8 @@
 import React from 'react';
 import {TextField, Autocomplete, Button, Modal, Box, FormControl, Alert} from '@mui/material';
 import {createCustomerAPI} from '../bigCommerce/customers/customers.create';
+import {useDispatch} from 'react-redux';
+import {addCustomer} from '../redux/bigCommerce/data';
 
 
 const createCustomerModel =  () => {
@@ -18,6 +20,7 @@ export default function SelectCustomer({customers, customer, setCustomer}) {
   const [modalOpen, setModalOpen] = React.useState(false);
   const [newCustomer, setNewCustomer] = React.useState(createCustomerModel());
   const [error, setError] = React.useState(null);
+  const dispatch = useDispatch();
 
   const handleCustomerSelect = (customer) => {
     setCustomer(customer);
@@ -28,14 +31,24 @@ export default function SelectCustomer({customers, customer, setCustomer}) {
   }
 
   const createNewCustomer = async () => {
-    if (newCustomer.first_name === '' || newCustomer.last_name === '' || newCustomer.phone === '' || newCustomer.email === '') {
+    if (newCustomer.first_name === '' || newCustomer.last_name === '' || newCustomer.phone === '') {
       return;
     }
-    let {customer, error} = await createCustomerAPI(newCustomer);
+    let email = newCustomer.email;
+    if (email === '') {
+      const randomString = Math.random().toString(36).substring(2, 10);
+      const randomDate = Math.floor(Math.random() * 31) + 1;
+      email = `test${randomDate}${randomString}@test.com`;
+    }
+
+    let updatedCustomer = { ...newCustomer, email};
+
+    let {customer, error} = await createCustomerAPI(updatedCustomer);
     if (customer) {
       setCustomer(customer);
+      dispatch(addCustomer(customer));
       setModalOpen(false);
-    } if (error) {
+    } else if (error) {
       setError(error);
     } else {
       setError("Unknown error!")

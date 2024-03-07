@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Modal, Box, TextField } from "@mui/material";
 
 import { useReactToPrint } from 'react-to-print';
@@ -6,30 +6,32 @@ import { useReactToPrint } from 'react-to-print';
 class ComponentToPrint extends React.Component {
   render() {
     return (
-      <div className="printComponent" style={{
-        height: '3.5in', // Constant box height
-        width: '2.25in', // Constant box width
+      <div className={'printComponent'} style={{
+        height: '2.25in', // Outer box height
+        width: '3.5in', // Outer box width
         display: 'flex',
         justifyContent: 'center', // Align text container horizontally in the middle
         alignItems: 'center', // Align text container vertically in the middle
         border: this.props.isPrintMode ? 'none' : '1px solid black', // Optional: adds a border to visualize the container
         position: 'relative', // Needed for absolute positioning of inner content
+        margin: 0,
+        padding: 0,
+        transform: 'translateX(00%) translateY(20%) rotate(270deg)', // Rotates the outer div
+        transformOrigin: 'center center', // Ensures rotation is about the center
       }}>
-        {/* Inner container for text to apply padding */}
         <div style={{
-          transform: 'rotate(270deg)', // Rotate the text
-          transformOrigin: 'center center', // Ensure rotation is centered
-          position: 'absolute', // Position absolutely to center in the parent
-          width: '100%', // Full width of the parent container
-          height: '100%', // Full height of the parent container
+          position: 'absolute',
+          top: '0.4in', // Half of the total height reduction to center the content
+          left: '0.25in', // Half of the total width reduction to center the content
+          height: '1.65in', // Reduced height (2.25in - 0.6in)
+          width: '3.0in', // Reduced width (3.5in - 0.5in)
           display: 'flex',
-          flexDirection: 'column', // Stack children vertically
-          justifyContent: 'center', // Center content vertically
-          paddingTop: `${this.props.topMargin}in`, // Apply padding to simulate top and bottom margins for the text
-          paddingBottom: `${this.props.bottomMargin}in`, // Apply padding to simulate top and bottom margins for the text
-          paddingLeft: `${this.props.leftMargin}in`, // Apply padding to simulate left margin for the text
-          paddingRight: `${this.props.rightMargin}in`, // Apply padding to simulate right margin for the text
-          fontSize: `${this.props.fz}px`, // Adjust text size as needed
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center', // Align text container vertically in the middle for flex-direction: column
+          fontSize: `${this.props.fz}px`,
+          border: this.props.isPrintMode ? 'none' : '1px solid black',
+          
         }}>
           <span style={{textAlign: 'center', width: '100%'}}>{this.props.message}</span>
         </div>
@@ -41,12 +43,8 @@ class ComponentToPrint extends React.Component {
 const PrintPreview = ({text, closePreview}) => {
 
   const [fz, setFz] = useState(10);
-  const [leftMargin, setLeftMargin] = useState(0.6);
-  const [rightMargin, setRightMargin] = useState(0.6);
-  const [topMargin, setTopMargin] = useState(0.9);
-  const [bottomMargin, setBottomMargin] = useState(0.4);
   const [isPrintMode, setIsPrintMode] = useState(false);
-
+ 
 
   const togglePrintMode = () => {
     setIsPrintMode(!isPrintMode);
@@ -54,7 +52,10 @@ const PrintPreview = ({text, closePreview}) => {
 
   const componentRef = React.useRef();
   const handlePrint = useReactToPrint({
-    content: () => componentRef.current,
+    content: () => {
+      const component = componentRef.current;
+      return component;
+    },
   });
 
 
@@ -67,13 +68,12 @@ const PrintPreview = ({text, closePreview}) => {
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            width: { xs: '90%', sm: 400 }, // Responsive width
+            width: { xs: '90%', sm: 300 }, // Responsive width
             bgcolor: 'background.paper',
             borderRadius: '8px',
             boxShadow: 24,
-            paddingLeft: 0,
-            paddingRight: 0,
-            paddingTop: 2,
+            paddingTop: 4,
+            margin: 0,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -85,59 +85,11 @@ const PrintPreview = ({text, closePreview}) => {
                 ref={componentRef} 
                 message={text} 
                 fz={fz}
-                leftMargin={leftMargin}
-                rightMargin={rightMargin}
-                topMargin={topMargin}
-                bottomMargin={bottomMargin}
                 isPrintMode={isPrintMode}
               />
             </div>
 
-            <div style={{ marginTop: '20px' }}>
-              <div>
-                <TextField
-                  id="leftMargin"
-                  type="number"
-                  label="Left Margin"
-                  value={leftMargin}
-                  size="small"
-                  inputProps={{ step: 0.1 }}
-                  onChange={(e) => setLeftMargin(e.target.value)}
-                />
-              </div>
-              <div>
-                <TextField
-                  id="rightMargin"
-                  type="number"
-                  label="Right Margin"
-                  value={rightMargin}
-                  size="small"
-                  inputProps={{ step: 0.1 }}
-                  onChange={(e) => setRightMargin(e.target.value)}
-                />
-              </div>
-              <div>
-                <TextField
-                  id="topMargin"
-                  type="number"
-                  label="Top Margin"
-                  value={topMargin}
-                  size="small"
-                  inputProps={{ step: 0.1 }}
-                  onChange={(e) => setTopMargin(e.target.value)}
-                />
-              </div>
-              <div>
-                <TextField
-                  id="bottomMargin"
-                  type="number"
-                  label="Bottom Margin"
-                  value={bottomMargin}
-                  size="small"
-                  inputProps={{ step: 0.1 }}
-                  onChange={(e) => setBottomMargin(e.target.value)}
-                />
-              </div>
+            <div style={{ marginTop: '120px' }}>
               <TextField
                   id="fz"
                   type="number"

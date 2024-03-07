@@ -42,7 +42,6 @@ export default function Shipping({customerId, products, consignment, updateConsi
   const matches = useMediaQuery(theme.breakpoints.down('sm'));
   const [modalOpen, setModalOpen] = useState(false);
   const [modelItem, setModelItem] = useState(createDefaultLineItem());
-  const addresses = useSelector((state) => state.data.customers.find((c) => c.id === customerId)?.addresses);
 
   const setShippingAddress = (address) => {
     updateConsignmentShippingAddress(consignment.internalId, address);
@@ -107,7 +106,7 @@ export default function Shipping({customerId, products, consignment, updateConsi
       }}
     >
       <Box flex={1} sx={{width: "100%"}} > 
-        <AddressForm title={"Shipping"} addresses={addresses} address={consignment.address} setAddress={setShippingAddress} />
+        <AddressForm title={"Shipping"} customerId={customerId} address={consignment.address} setAddress={setShippingAddress} />
       </Box>
       {matches ? <Divider sx={{ my: 2 }} /> : <Divider orientation="vertical" flexItem />}
       <Box 
