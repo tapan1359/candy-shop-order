@@ -27,8 +27,8 @@ export default function OrderIndex() {
   const [loading, setLoading] = useState(false);
 
   const [filterParams, setFilterParams] = useState({
-    startDate: moment().subtract(1, 'week'),
-    endDate: moment(),
+    startDate: null,
+    endDate: null,
     status: '',
     email: '',
     minId: '',
@@ -52,10 +52,14 @@ export default function OrderIndex() {
         setLoading(false);
       }
     };
-    getOrdersfromAPI();
+    if (Object.keys(orderFilters).length > 0) {
+      getOrdersfromAPI();
+    }
   }, [orderFilters]);
 
   useEffect(() => {
+    handleDateChange(moment().subtract(1, 'week'), 'startDate');
+    handleDateChange(moment(), 'endDate');
     applyFilters();
   }, []);
 

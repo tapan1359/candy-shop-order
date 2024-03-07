@@ -24,7 +24,6 @@ export default function AddressForm({ title, customerId, address, setAddress }) 
   const addresses = useSelector((state) => state.data.customers.find((c) => c.id === customerId)?.addresses);
 
   useEffect(() => {
-    console.log('addresses', addresses);
     setAddress(null);
   }, [addresses]);
 

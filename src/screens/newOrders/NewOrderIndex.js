@@ -57,10 +57,6 @@ export default function NewOrderIndex() {
   
   const [orderCreated, setOrderCreated] = React.useState(false);
 
-  useEffect(() => {
-    console.log("Updated"); 
-  }, []);
-
   const resetPage = () => {
     setError(null);
     setCustomer(null);
