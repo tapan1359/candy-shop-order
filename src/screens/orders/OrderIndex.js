@@ -27,8 +27,8 @@ export default function OrderIndex() {
   const [loading, setLoading] = useState(false);
 
   const [filterParams, setFilterParams] = useState({
-    startDate: null,
-    endDate: null,
+    startDate: moment().subtract(1, 'week'),
+    endDate: moment(),
     status: '',
     email: '',
     minId: '',
