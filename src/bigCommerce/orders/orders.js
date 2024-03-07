@@ -57,6 +57,26 @@ const createLineItemsForConsignments = (consignment, cartLineItems) => {
   })
 }
 
+
+const createLineItemsForPickup = (lineItems) => {
+  let items = [];
+  lineItems.physical_items.forEach((item) => {
+    items.push({
+      "quantity": item.quantity,
+      "item_id": item.id
+    });
+  });
+
+  lineItems.custom_items.forEach((item) => {
+    items.push({
+      "quantity": item.quantity,
+      "item_id": item.id
+    });
+  });
+
+  return items;
+}
+
 export const createCart = async ({customerId, items}) => {
   const {lineItems, customItems} = convertToCartAPIItems(items);
   const response = await api_bigCommerce.post('/v3/carts', {
@@ -93,6 +113,24 @@ export const createShippingConsignments = async ({checkoutId, consignments, cart
 
   return response.data;
 }
+
+export const createPickupConsignments = async ({checkoutId, lineItems}) => {
+
+  let payload = [
+    {
+      "pickup_option": {
+        "pickup_method_id": 1
+      },
+      "line_items": createLineItemsForPickup(lineItems)
+    }
+  ]
+  
+  const response = await api_bigCommerce.post(
+    `/v3/checkouts/${checkoutId}/consignments`, payload
+  );
+
+  return response.data;
+  }
 
 
 export const addShippingOptions = async ({ checkoutId, consignmentToShippingMapping }) => {

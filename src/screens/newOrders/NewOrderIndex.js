@@ -6,10 +6,16 @@ import {
   TextField,
   Typography,
   Modal,
+  FormControl,
+  FormLabel,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import SelectCustomer from '../../componants/SelectCustomer';
 import Shipping from "../../componants/Shipping";
+import Pickup from "../../componants/Pickup";
 import AddressForm from "../../componants/AddressForm";
 import {
   addCheckoutBillingAddress,
@@ -17,7 +23,8 @@ import {
   createCart, createOrder,
   createShippingConsignments,
   getCheckout,
-  getOrder
+  getOrder,
+  createPickupConsignments
 } from "../../bigCommerce/orders/orders";
 import {ShippingOptions} from "../../componants/ShippingOptions";
 import {processOrderPayment} from "../../bigCommerce/payment/payments";
@@ -54,6 +61,10 @@ export default function NewOrderIndex() {
   const [orderId, setOrderId] = React.useState(null);
   const [paymentModalOpen, setPaymentModalOpen] = React.useState(false);
   const [paymentInfo, setPaymentInfo] = React.useState(null);
+  const [fullfillmentType, setFullfillmentType] = React.useState("shipping");
+  const [pickupConsignment, setPickupConsignment] = React.useState({
+    items: []
+  });
   
   const [orderCreated, setOrderCreated] = React.useState(false);
   const [alertMessage, setAlertMessage] = React.useState(null);
@@ -72,6 +83,8 @@ export default function NewOrderIndex() {
     setOrderId(null);
     setPaymentInfo(null);
     setOrderCreated(false);
+    setPickupConsignment({items: []});
+    setFullfillmentType("shipping");
   }
 
   const addConsignment = () => {
@@ -101,8 +114,20 @@ export default function NewOrderIndex() {
     }));
   }
 
-  const disableCreateCart = () => {
+  const updatePickupConsignmentItems = (items) => {
+    setPickupConsignment({...pickupConsignment, items});
+  }
+
+  const disableShippingCart = () => {
     if (!customer || !billing || consignments.length === 0) {
+      return true;
+    }
+  }
+
+  const disablePickupCart = () => {
+    console.log(pickupConsignment.items.length);
+    console.log(customer);
+    if (!customer || pickupConsignment.items.length === 0) {
       return true;
     }
   }
@@ -118,7 +143,48 @@ export default function NewOrderIndex() {
     setConsignmentToShippingMapping({...consignmentToShippingMapping, [consignmentId]: shippingOptionId});
   }
 
-  const handleSubmit = async () => {
+  const handlePickupCart = async () => {
+    try {
+      setLoading(true);
+      setAlertMessage(null);
+
+      if (pickupConsignment.items.length === 0) {
+        setAlertMessage({message: "Invalid consignments. check items.", severity: "error"});
+        return
+      }
+
+      const cart = await createCart({
+        customerId: customer.id,
+        items: pickupConsignment.items
+      });
+      const checkoutId = cart.data.id;
+      dispatch(setCart(cart.data));
+
+
+      const consignmentResponse = await createPickupConsignments({
+        checkoutId,
+        lineItems: cart.data.line_items
+      });
+
+      setAlertMessage({message: "Cart and Consignments created!", severity: "success"});
+
+      dispatch(setCheckout(consignmentResponse.data));
+
+      // consignmentResponse.data.consignments.
+      setAPIConsignments(consignmentResponse.data.consignments);
+
+      setCheckoutId(checkoutId);
+
+    } catch (error) {
+      const data = error.response.data;
+      setAlertMessage({message: JSON.stringify(data?.title), severity: "error"});
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleShippingCart = async () => {
 
     try {
       setLoading(true);
@@ -129,6 +195,8 @@ export default function NewOrderIndex() {
         return
       }
 
+
+
       // Create Cart
       const cart = await createCart({
         customerId: customer.id,
@@ -138,11 +206,15 @@ export default function NewOrderIndex() {
       dispatch(setCart(cart.data));
 
       // Create Consignments
+
+
       const consignmentResponse = await createShippingConsignments({
         checkoutId,
         consignments,
         cartLineItems: cart.data.line_items
       });
+
+
 
       setAlertMessage({message: "Cart and Consignments created!", severity: "success"});
 
@@ -275,45 +347,74 @@ export default function NewOrderIndex() {
           <>
             <AddressForm title={"Billing Address"} customerId={customer?.id} address={billing} setAddress={setBilling} />
           <Divider />
-
-          <Typography variant="h6">Shipping Addresses</Typography>
-          {consignments.map((consignment) => (
-            <Box
-              key={consignment.internalId}
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2,
-                padding: 2,
-                borderRadius: 2,
-              }}
+          <FormControl>
+            <FormLabel>Select Fulfillment Type</FormLabel>
+            <RadioGroup
+              row
+              value={fullfillmentType}
+              onChange={(event) => setFullfillmentType(event.target.value)}
             >
-              <Shipping 
-                key={consignment.internalId} 
-                customerId={customer?.id} 
-                products={products} 
-                consignment={consignment} 
-                updateConsignmentShippingAddress={updateConsignmentShippingAddress}
-                updateConsignmentItems={updateConsignmentItems}
-                removeConsignment={removeConsignment} 
-              />
-            </Box>
-          ))}
-          <Button
-            onClick={addConsignment}
-          >
-            Add New Consignment
-          </Button>
-          <Divider />
-          <Button
-            size={"large"}
-            onClick={handleSubmit}
-            disabled={disableCreateCart()}
-          >
-            {loading ? "Loading..." : "Create Cart and Get Shipping Options"}
-          </Button>
-          <Divider />
-          <ShippingOptions APIConsignments={APIConsignments} setShippingOption={setShippingOption} />
+              <FormControlLabel value="shipping" control={<Radio />} label="Shipping" />
+              <FormControlLabel value="pickup" control={<Radio />} label="Pickup" />
+            </RadioGroup>
+          </FormControl>
+          {fullfillmentType === "pickup" && (
+            <>
+            <Pickup  
+              products={products} 
+              consignment={pickupConsignment} 
+              updateConsignmentItems={updatePickupConsignmentItems}
+            />
+            <Divider />
+              <Button
+                size={"large"}
+                onClick={handlePickupCart}
+              >
+                {loading ? "Loading..." : "Create Cart and Get Shipping Options"}
+              </Button>
+            </>  
+          )}
+          {fullfillmentType === "shipping" && (
+            <>
+              <Typography variant="h6">Shipping Addresses</Typography>
+              {consignments.map((consignment) => (
+                <Box
+                  key={consignment.internalId}
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 2,
+                    padding: 2,
+                    borderRadius: 2,
+                  }}
+                >
+                  <Shipping 
+                    key={consignment.internalId} 
+                    customerId={customer?.id} 
+                    products={products} 
+                    consignment={consignment} 
+                    updateConsignmentShippingAddress={updateConsignmentShippingAddress}
+                    updateConsignmentItems={updateConsignmentItems}
+                    removeConsignment={removeConsignment} 
+                  />
+                </Box>
+              ))}
+              <Button
+                onClick={addConsignment}
+              >
+                Add New Consignment
+              </Button>
+              <Divider />
+              <Button
+                size={"large"}
+                onClick={handleShippingCart}
+              >
+                {loading ? "Loading..." : "Create Cart and Get Shipping Options"}
+              </Button>
+              <Divider />
+              <ShippingOptions APIConsignments={APIConsignments} setShippingOption={setShippingOption} />
+            </>
+          )}
           <Divider />
           <Button
             size={"large"}

@@ -1,6 +1,6 @@
 import React, {useState } from 'react';
 import {
-  Box, TextField, FormControl, Button, Modal, Alert
+  Box, TextField, FormControl, Button, Modal, Alert, FormControlLabel, Switch
 } from '@mui/material';
 import {useDispatch} from 'react-redux';
 import {addCustomer} from '../redux/bigCommerce/data';
@@ -20,6 +20,7 @@ const CreateCustomer = ({setCustomer}) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [newCustomer, setNewCustomer] = React.useState(createCustomerModel());
   const [alertMessage, setAlertMessage] = React.useState(null);
+  const [defaultAddressSwitchChecked, setDefaultAddressSwitchChecked] = React.useState(false);
   const dispatch = useDispatch();
   
   const handleCreateNewCustomer = (e) => {
@@ -40,6 +41,20 @@ const CreateCustomer = ({setCustomer}) => {
 
     let updatedCustomer = { ...newCustomer, email};
 
+    if (defaultAddressSwitchChecked) {
+      updatedCustomer.addresses = [
+        {
+          first_name: newCustomer.first_name,
+          last_name: newCustomer.last_name,
+          address1: '123 Main St',
+          city: 'Baltimore',
+          state_or_province: 'Maryland',
+          postal_code: '21201',
+          country_code: 'US',
+        }
+      ]
+    }
+
     let {customer, error} = await createCustomerAPI(updatedCustomer);
     if (customer) {
       setCustomer(customer);
@@ -54,6 +69,9 @@ const CreateCustomer = ({setCustomer}) => {
     }
   }
 
+  const toggleDefaultAddressSwitch = () => {
+    setDefaultAddressSwitchChecked(!defaultAddressSwitchChecked);
+  }
 
   return (
     <>
@@ -153,7 +171,6 @@ const CreateCustomer = ({setCustomer}) => {
               size={"small"}
             />
             <TextField
-              required
               id="email"
               name="email"
               label="Email"
@@ -162,6 +179,15 @@ const CreateCustomer = ({setCustomer}) => {
               onChange={handleCreateNewCustomer}
               margin="normal"
               size={"small"}
+            />
+            <FormControlLabel 
+              control={
+                <Switch 
+                  checked={defaultAddressSwitchChecked}
+                  onChange={toggleDefaultAddressSwitch}
+                />
+              } 
+              label="Create Default Address" 
             />
             <Button
               onClick={() => createNewCustomer()}

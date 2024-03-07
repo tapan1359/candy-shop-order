@@ -203,7 +203,6 @@ export default function CreateAddress({customerId}) {
             >
               <TextField
                 size={"small"}
-                required
                 id="postal_code"
                 name="postal_code"
                 label="Zip / Postal code"
@@ -215,7 +214,6 @@ export default function CreateAddress({customerId}) {
             </div>
 
             <TextField
-              required
               id="phone"
               name="phone"
               label="Phone Number"
