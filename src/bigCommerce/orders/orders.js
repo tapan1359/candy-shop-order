@@ -28,6 +28,7 @@ const convertToCartAPIItems = (items) => {
 
 
 const createBillingForAPI = (billing) => {
+  console.log('billing', billing);
   if (billing.giftMessage) {
     billing["custom_fields"] = [
       {
@@ -36,7 +37,9 @@ const createBillingForAPI = (billing) => {
       }
     ]
   }
-  billing.state_or_province = billing.state;
+  if (!billing.state_or_province) {
+    billing.state_or_province = billing.state;
+  }
   delete billing.giftMessage;
   return billing;
 }

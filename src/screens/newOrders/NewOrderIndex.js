@@ -264,6 +264,7 @@ export default function NewOrderIndex() {
 
 
     } catch (error) {
+      console.log(error);
       const data = error.response.data;
       setAlertMessage({message: JSON.stringify(data?.title), severity: "error"});
       setLoading(false);
@@ -302,6 +303,15 @@ export default function NewOrderIndex() {
     }
   }
 
+  const handleCreateNewCustomer = async (customer) => {
+    setCustomer(customer);
+    console.log(customer);
+    if (customer.addresses.length > 0) {
+      console.log(customer.addresses[0]);
+      setBilling(customer.addresses[0]);
+    }
+  }
+
   return (
     <>
       <FloatOrderDetails />
@@ -336,8 +346,8 @@ export default function NewOrderIndex() {
           }}
         >
           <SelectCustomer customers={customers} customer={customer} setCustomer={setCustomer} />
-          <CreateAddress customerId={customer?.id} />
-          <CreateCustomer setCustomer={setCustomer}/>
+          <CreateAddress buttonName="New Address" customerId={customer?.id} />
+          <CreateCustomer setCustomer={handleCreateNewCustomer}/>
           <Button color={'error'} onClick={resetPage}>
             RESET
           </Button>
@@ -376,7 +386,7 @@ export default function NewOrderIndex() {
           )}
           {fullfillmentType === "shipping" && (
             <>
-              <Typography variant="h6">Shipping Addresses</Typography>
+              <CreateAddress buttonName="New Shipping Address" customerId={customer?.id} />
               {consignments.map((consignment) => (
                 <Box
                   key={consignment.internalId}

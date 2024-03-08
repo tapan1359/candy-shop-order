@@ -19,10 +19,9 @@ const billingInfoEmpty = {
   phone: '',
 };
 
-export default function CreateAddress({customerId}) {
+export default function CreateAddress({buttonName, customerId}) {
   const [modalOpen, setModalOpen] = useState(false);
   const [address, setAddress] = useState(billingInfoEmpty);
-  const [error, setError] = useState(null);
   const [alertMessage, setAlertMessage] = React.useState(null);
   const dispatch = useDispatch();
 
@@ -31,7 +30,7 @@ export default function CreateAddress({customerId}) {
   }
 
   const handleCreateAddress = async () => {
-    setError(null);
+    setAlertMessage(null);
     if (address.first_name === '' || address.last_name === '' || address.address1 === '' || address.city === '') {
       setAlertMessage({severity: "error", message: "Please fill in all required fields - firstname, lastname, address1, city"});
       return;
@@ -84,7 +83,7 @@ export default function CreateAddress({customerId}) {
         variant={"outlined"}
         disabled={!customerId}
       >
-        Add New Address
+        {buttonName}
       </Button>
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <Box
