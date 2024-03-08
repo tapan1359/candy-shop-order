@@ -1,11 +1,12 @@
-import React, {useState } from 'react';
+import React, {useEffect, useState } from 'react';
 import {
-  Box, TextField, FormControl, Button, Modal, Alert
+  Box, TextField, FormControl, Button, Modal, Alert, FormControlLabel, Switch, Autocomplete
 } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import {createAddressAPI} from '../bigCommerce/customers/addresses.create';
 import {getCustomerById} from '../bigCommerce/customers/customers.get';
 import {updateCustomerById} from '../redux/bigCommerce/data';
+import {STATES} from '../../src/constants'
 
 
 const billingInfoEmpty = {
@@ -14,7 +15,7 @@ const billingInfoEmpty = {
   address1: '',
   address2: '',
   city: '',
-  state_or_province: '',
+  state: {code: 'MD', value: 'Maryland'},
   postal_code: '',
   phone: '',
 };
@@ -23,30 +24,52 @@ export default function CreateAddress({buttonName, customerId, setParentAddress 
   const [modalOpen, setModalOpen] = useState(false);
   const [address, setAddress] = useState(billingInfoEmpty);
   const [alertMessage, setAlertMessage] = React.useState(null);
+  const [localDelivery, setLocalDelivery] = React.useState(false);
   const dispatch = useDispatch();
 
   const handleUpdateField = (e) => {
     setAddress({ ...address, [e.target.name]: e.target.value });
   }
 
+  useEffect(() => {
+    console.log(address);
+  }, [address]);
+
+
+  const handleUpdateState = (_, state) => {
+    console.log(state?.value);
+    if (state) setAddress({ ...address, state });
+  }
+
   const handleCreateAddress = async () => {
     setAlertMessage(null);
-    if (address.first_name === '' || address.last_name === '' || address.address1 === '' || address.city === '') {
+
+    let localCopyAddress = {...address};
+
+    if (localDelivery) {
+      localCopyAddress.city = 'Baltimore';
+      localCopyAddress.state_or_province = 'Maryland';
+      localCopyAddress.postal_code = '21201';
+    }
+
+    localCopyAddress.country_code = "US";
+    localCopyAddress.state_or_province = address.state.value;
+
+    if (localCopyAddress.first_name === '' || localCopyAddress.last_name === '' || localCopyAddress.address1 === '' || localCopyAddress.city === '') {
       setAlertMessage({severity: "error", message: "Please fill in all required fields - firstname, lastname, address1, city"});
       return;
     }
 
-    address.country_code = "US";
-    let result = await createAddressAPI(address, customerId);
+
+    let result = await createAddressAPI(localCopyAddress, customerId);
     if (result.address) {
       let r = await getCustomerById(customerId);
       dispatch(updateCustomerById(r.customer));
-      setParentAddress(result.address);
+      if (setParentAddress) {
+        setParentAddress(result.address);
+      }
       setAddress(null);
       setModalOpen(false);
-      if (setAddress) {
-        setAddress(result.address);
-      }
       setAlertMessage({severity: "success", message: "Address created successfully!"});
     } else if (result.error) {
       setAlertMessage({severity: "error", message: JSON.stringify(result.error)});
@@ -184,15 +207,13 @@ export default function CreateAddress({buttonName, customerId, setParentAddress 
                 size={"small"}
               />
 
-              <TextField
-                id="state_or_province"
-                name="state_or_province"
-                label="State/Province/Region"
-                fullWidth
-                value={address?.state_or_province}
-                onChange={handleUpdateField}
-                margin="normal"
-                size={"small"}
+              <Autocomplete
+                id="state"
+                options={STATES}
+                getOptionLabel={(option) => option.code}
+                renderInput={(params) => <TextField {...params} label="State" margin="normal" size={"small"} />}
+                onChange={handleUpdateState}
+                value={address?.state}
               />
             </div>
 
@@ -225,6 +246,15 @@ export default function CreateAddress({buttonName, customerId, setParentAddress 
               onChange={handleUpdateField}
               margin="normal"
               size={"small"}
+            />
+            <FormControlLabel 
+              control={
+                <Switch 
+                  checked={localDelivery}
+                  onChange={() => setLocalDelivery(!localDelivery)}
+                />
+              } 
+              label="Local Delivery" 
             />
             <Button
               onClick={handleCreateAddress}
