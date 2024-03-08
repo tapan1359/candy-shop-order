@@ -19,7 +19,7 @@ const billingInfoEmpty = {
   phone: '',
 };
 
-export default function CreateAddress({buttonName, customerId}) {
+export default function CreateAddress({buttonName, customerId, setParentAddress = null}) {
   const [modalOpen, setModalOpen] = useState(false);
   const [address, setAddress] = useState(billingInfoEmpty);
   const [alertMessage, setAlertMessage] = React.useState(null);
@@ -41,8 +41,12 @@ export default function CreateAddress({buttonName, customerId}) {
     if (result.address) {
       let r = await getCustomerById(customerId);
       dispatch(updateCustomerById(r.customer));
+      setParentAddress(result.address);
       setAddress(null);
       setModalOpen(false);
+      if (setAddress) {
+        setAddress(result.address);
+      }
       setAlertMessage({severity: "success", message: "Address created successfully!"});
     } else if (result.error) {
       setAlertMessage({severity: "error", message: JSON.stringify(result.error)});

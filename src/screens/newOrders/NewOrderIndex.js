@@ -386,7 +386,6 @@ export default function NewOrderIndex() {
           )}
           {fullfillmentType === "shipping" && (
             <>
-              <CreateAddress buttonName="New Shipping Address" customerId={customer?.id} />
               {consignments.map((consignment) => (
                 <Box
                   key={consignment.internalId}

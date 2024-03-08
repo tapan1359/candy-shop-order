@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from '@mui/icons-material/Delete';
+import CreateAddress from "./CreateAddress";
 
 const DEFAULT_TAX = 6;
 
@@ -105,7 +106,10 @@ export default function Shipping({customerId, products, consignment, updateConsi
         alignItems: 'flex-start',
       }}
     >
-      <Box flex={1} sx={{width: "100%"}} > 
+      <Box flex={1} sx={{
+          width: "100%",
+        }} >
+        <CreateAddress buttonName="New Shipping Address" customerId={customerId} setParentAddress={setShippingAddress}/>
         <AddressForm title={"Shipping"} customerId={customerId} address={consignment.address} setAddress={setShippingAddress} />
       </Box>
       {matches ? <Divider sx={{ my: 2 }} /> : <Divider orientation="vertical" flexItem />}
