@@ -16,6 +16,7 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
+import PrintInvoice from '../../componants/PrintInvoice';
 
 export default function OrderIndex() {
 
@@ -282,6 +283,8 @@ export default function OrderIndex() {
                 <Typography>{order.status}</Typography>
                 <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', sm: 'block' } }} />
                 <Typography>{moment(order.date_created).format('MM/DD/YYYY')}</Typography>
+                <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', sm: 'block' } }} />
+                <PrintInvoice order={order} />
               </Box>
             </AccordionSummary>
             <AccordionDetails>

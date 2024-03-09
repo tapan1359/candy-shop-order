@@ -4,7 +4,7 @@ import { api_bigCommerce } from '../api/api.bigCommerce';
 // In your renderer file (e.g., a React component)
 export const getOrders = async ({ params = {} }) => {
 
-  params = {include: "consignments", ...params}
+  params = {include: "consignments,consignments.line_items", ...params}
 
   try {
     // Create the Axios config object
