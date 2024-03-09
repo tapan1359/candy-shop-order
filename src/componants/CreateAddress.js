@@ -45,15 +45,15 @@ export default function CreateAddress({buttonName, customerId, setParentAddress 
     setAlertMessage(null);
 
     let localCopyAddress = {...address};
+    
+    localCopyAddress.country_code = "US";
+    localCopyAddress.state_or_province = address.state.value;
 
     if (localDelivery) {
       localCopyAddress.city = 'Baltimore';
       localCopyAddress.state_or_province = 'Maryland';
       localCopyAddress.postal_code = '21201';
     }
-
-    localCopyAddress.country_code = "US";
-    localCopyAddress.state_or_province = address.state.value;
 
     if (localCopyAddress.first_name === '' || localCopyAddress.last_name === '' || localCopyAddress.address1 === '' || localCopyAddress.city === '') {
       setAlertMessage({severity: "error", message: "Please fill in all required fields - firstname, lastname, address1, city"});
