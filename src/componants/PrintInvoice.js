@@ -49,7 +49,7 @@ class ComponentToPrint extends React.Component {
                           <Divider sx={{ my: 1 }} />
                         </TableCell>
                       )}
-                      <TableCell align="right">{lineItem.quantity}</TableCell>
+                      <TableCell align="right" sx={{color: 'red', fontSize: '1.5em'}}>{lineItem.quantity}</TableCell>
                       <TableCell align="right">{lineItem.sku}</TableCell>
                       <TableCell align="right">{lineItem.name}</TableCell>
                       <TableCell align="right">${lineItem.price_ex_tax}</TableCell>
@@ -104,7 +104,7 @@ class ComponentToPrint extends React.Component {
                           ))}
                         </TableCell>
                       )}
-                      <TableCell align="right">{lineItem.quantity}</TableCell>
+                      <TableCell align="right" sx={{color: 'red', fontSize: '1.5em'}}>{lineItem.quantity}</TableCell>
                       <TableCell align="right">{lineItem.sku}</TableCell>
                       <TableCell align="right">{lineItem.name}</TableCell>
                       <TableCell align="right">${lineItem.price_ex_tax}</TableCell>

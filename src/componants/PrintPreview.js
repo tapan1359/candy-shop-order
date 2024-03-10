@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Button, Modal, Box, TextField } from "@mui/material";
 
 import { useReactToPrint } from 'react-to-print';
+import './PrintPreview.css';
 
 class ComponentToPrint extends React.Component {
   render() {
     return (
-      <div className={'printComponent'} style={{
+      <div className={'cardPrintComponent'} style={{
         height: '3.5in', // Outer box height
         width: '2.25in', // Outer box width
         display: 'flex',
@@ -19,7 +20,7 @@ class ComponentToPrint extends React.Component {
       }}>
         <div style={{
           position: 'absolute',
-          top: '0.15in', // Half of the total height reduction to center the content
+          top: '0.20in', // Half of the total height reduction to center the content
           left: '0.4in', // Half of the total width reduction to center the content
           height: '3.0in', // Reduced height (2.25in - 0.6in)
           width: '1.65in', // Reduced width (3.5in - 0.5in)
@@ -88,7 +89,7 @@ const PrintPreview = ({text, closePreview}) => {
 
   return (
     <div>
-      <Modal open>
+      <Modal open onClose={() => closePreview()}>
         <Box
           sx={{
             position: 'absolute',
@@ -107,26 +108,24 @@ const PrintPreview = ({text, closePreview}) => {
             justifyContent: 'center',
           }}
         >
-            <div>
-              <ComponentToPrint 
-                ref={componentRef} 
-                message={text} 
-                fz={fz}
-                isPrintMode={isPrintMode}
-                lineHeight={lineHeight}
-              />
-            </div>
+          <ComponentToPrint 
+            ref={componentRef} 
+            message={text} 
+            fz={fz}
+            isPrintMode={isPrintMode}
+            lineHeight={lineHeight}
+          />
 
-            <div style={{ marginTop: '20px' }}>
-              <TextField
-                  id="fz"
-                  type="number"
-                  label="Font Size"
-                  value={fz}
-                  size="small"
-                  onChange={(e) => setFz(e.target.value)}
-                />
-            </div>
+          <div style={{ marginTop: '20px' }}>
+            <TextField
+                id="fz"
+                type="number"
+                label="Font Size"
+                value={fz}
+                size="small"
+                onChange={(e) => setFz(e.target.value)}
+              />
+          </div>
 
           <Button onClick={() => closePreview()}>Close</Button>
           <Button onClick={togglePrintMode}>Toggle Print Mode</Button>
