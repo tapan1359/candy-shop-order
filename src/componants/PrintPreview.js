@@ -19,7 +19,7 @@ class ComponentToPrint extends React.Component {
       }}>
         <div style={{
           position: 'absolute',
-          top: '0.25in', // Half of the total height reduction to center the content
+          top: '0.20in', // Half of the total height reduction to center the content
           left: '0.4in', // Half of the total width reduction to center the content
           height: '3.0in', // Reduced height (2.25in - 0.6in)
           width: '1.65in', // Reduced width (3.5in - 0.5in)
