@@ -5,7 +5,7 @@ import { getAllProducts } from '../../bigCommerce/products/products.get';
 import { setCustomers, setProducts } from '../../redux/bigCommerce/data';
 import LoadItem from '../../componants/LoadItem';
 import { Box, Button, TextField, Alert } from '@mui/material';
-import PrintPreview from '../../componants/PrintPreview';
+import PrintModal from '../../componants/PrintPreview/PrintModal';
 
 function UpdateDataScreen() {
   const dispatch = useDispatch();
@@ -70,7 +70,7 @@ function UpdateDataScreen() {
           <Button onClick={() => setPreview(true)} sx={{ alignSelf: 'start' }}>Print</Button>
         </Box>
       </Box>
-      {preview && <PrintPreview text={printMessage} closePreview={closePreviewModal} />}
+      {preview && <PrintModal text={printMessage} closePreview={closePreviewModal} />}
     </div>
 
   );

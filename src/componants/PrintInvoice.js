@@ -141,6 +141,7 @@ class ComponentToPrint extends React.Component {
         <Typography variant="h4">Invoice</Typography>
         <Typography variant="body1">Order Number: {order.id}</Typography>
         <Typography variant="subtitle2">Order Date: {moment(order.date_created).format("Do MMM YYYY") }</Typography>
+        <Typography variant="body1" sx={{ color: 'red'}} >Status: {order.status}</Typography>
         <Divider sx={{ my: 1 }} />
         <Typography variant="body2">Billing Address</Typography>
         <Typography variant="subtitle2">{billingAddress.first_name} {billingAddress.last_name}</Typography>

@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import moment from 'moment';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import PrintPreview from '../../componants/PrintPreview';
+import PrintModal from '../../componants/PrintPreview/PrintModal';
 import { getOrders } from '../../bigCommerce/orders/orders.get';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -381,7 +381,7 @@ export default function OrderIndex() {
         </Grid>
       </Box>
       )}
-      {preview && <PrintPreview text={message} closePreview={closePreviewModal} />}
+      {preview && <PrintModal text={message} closePreview={closePreviewModal} />}
     </div>
   );
 }
