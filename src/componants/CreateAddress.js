@@ -46,8 +46,12 @@ export default function CreateAddress({buttonName, customerId, setParentAddress 
 
     let localCopyAddress = {...address};
     
+    console.log(localCopyAddress);
+
     localCopyAddress.country_code = "US";
-    localCopyAddress.state_or_province = address.state.value;
+    localCopyAddress.state_or_province = localCopyAddress.state.label;
+
+    console.log(localCopyAddress);
 
     if (localDelivery) {
       localCopyAddress.city = 'Baltimore';
