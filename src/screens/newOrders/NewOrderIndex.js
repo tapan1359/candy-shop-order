@@ -280,7 +280,12 @@ export default function NewOrderIndex() {
       setLoading(true);
       setAlertMessage(null);
       
-      if (!orderId || !paymentInfo) {
+      if (!orderId) {
+        setAlertMessage({message: "Order not created!", severity: "error"});
+        return;
+      }
+
+      if (!paymentInfo) {
         setAlertMessage({message: "provide payment info!", severity: "error"});
         return;
       }
@@ -452,7 +457,6 @@ export default function NewOrderIndex() {
         <Button
           size={"large"}
           onClick={() => setPaymentModalOpen(true)}
-          disabled={!orderId}
         >Add Payment</Button>
 
         <Modal
