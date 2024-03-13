@@ -3,8 +3,11 @@ import { api_bigCommerce, paymentapi_bigCommerce } from '../api/api.bigCommerce'
 
   
 export const processOrderPayment = async ({orderId, paymentInfo}) => {
-
   try {
+    if (typeof orderId === 'string') {
+      orderId = parseInt(orderId);
+    }
+
     const response = await api_bigCommerce.post('/v3/payments/access_tokens', {"order": {"id": orderId}})
 
     let paymentAccessToken = response.data.data.id;
