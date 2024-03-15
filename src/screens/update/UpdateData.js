@@ -6,7 +6,7 @@ import { setCustomers, setProducts } from '../../redux/bigCommerce/data';
 import LoadItem from '../../componants/LoadItem';
 import { Box, Button, TextField, Alert, Divider, Modal, Typography } from '@mui/material';
 import PrintModal from '../../componants/PrintPreview/PrintModal';
-import {getOrder} from "../../bigCommerce/orders/orders";
+import {getOrder, updateOrderBillingAddressZipCode} from "../../bigCommerce/orders/orders";
 import {processOrderPayment} from "../../bigCommerce/payment/payments";
 
 function UpdateDataScreen() {
@@ -72,6 +72,45 @@ function UpdateDataScreen() {
 
       if (!paymentInfo) {
         setAlertMessage({message: "provide payment info!", severity: "error"});
+        return;
+      }
+
+      if (!paymentInfo.nameOnCard || !paymentInfo.cardNumber || !paymentInfo.cvv || !paymentInfo.expiryMonth || !paymentInfo.expiryYear || !paymentInfo.zipcode) {
+        setAlertMessage({message: "provide all payment info!", severity: "error"});
+        return;
+      }
+
+      if (paymentInfo.zipcode && paymentInfo.zipcode.length !== 5) {
+        setAlertMessage({message: "Invalid Zipcode!", severity: "error"});
+        return;
+      }
+
+      if (paymentInfo.cardNumber && paymentInfo.cardNumber.length !== 16) {
+        setAlertMessage({message: "Invalid Card Number!", severity: "error"});
+        return;
+      }
+
+      if (paymentInfo.cvv && (paymentInfo.cvv.length < 3 && paymentInfo.cvv.length > 4)) {
+        setAlertMessage({message: "Invalid CVV!", severity: "error"});
+        return;
+      }
+
+      if (paymentInfo.expiryMonth && (paymentInfo.expiryMonth < 1 || paymentInfo.expiryMonth > 12)) {
+        setAlertMessage({message: "Invalid Expiry Month!", severity: "error"});
+        return;
+      }
+
+      if (paymentInfo.expiryYear && paymentInfo.expiryYear.length !== 4) {
+        setAlertMessage({message: "Invalid Expiry Year!. Make sure it's 4 digit year", severity: "error"});
+        return;
+      }
+
+      try {
+        if (parseInt(paymentInfo.zipcode) !== parseInt(order.billing_address.zip)) {
+          await updateOrderBillingAddressZipCode({orderId, zipCode: paymentInfo.zipcode})
+        }
+      } catch (error) {
+        setAlertMessage({message: "ZipCode is different than billing. Error updating zip code", severity: "error"});
         return;
       }
 
@@ -189,6 +228,12 @@ function UpdateDataScreen() {
               type="number"
               value={paymentInfo?.expiryDate}
               onChange={(event) => setPaymentInfo({...paymentInfo, expiryYear: event.target.value})}
+            />
+            <TextField
+              label="Zip Code"
+              type="number"
+              value={paymentInfo?.zipcode}
+              onChange={(event) => setPaymentInfo({...paymentInfo, zipcode: event.target.value})}
             />
             <Button
               onClick={handlePayment}

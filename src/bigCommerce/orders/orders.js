@@ -181,3 +181,13 @@ export const getCheckout = async ({checkoutId}) => {
   );
   return response.data;
 }
+
+
+export const updateOrderBillingAddressZipCode = async ({orderId, zipCode}) => {
+  const response = await api_bigCommerce.put(
+    `/v2/orders/${orderId}`,
+    { "billing_address": {"zip": zipCode }}
+  );
+
+  return response.data;
+}
