@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import {
   Box, TextField, Typography, FormControl, Autocomplete, Button, Modal, Divider,
 } from '@mui/material';
+import {STATES} from '../../src/constants'
 
 const billingInfoEmpty = {
   first_name: '',
@@ -31,6 +32,7 @@ export default function AddressForm({ title, customerId, address, setAddress }) 
   const handleSelectBilling = async (address) => {
     if (address) {
       setAddress({
+        id: address.id,
         first_name: address.first_name,
         last_name: address.last_name,
         address1: address.address1,
@@ -52,6 +54,10 @@ export default function AddressForm({ title, customerId, address, setAddress }) 
     setAddress({ ...address, [e.target.name]: e.target.value });
   }
 
+  const handleUpdateState = (_, newValue) => {
+    setAddress({ ...address, state: newValue.label });
+  };
+
 
   return (
     <Box
@@ -71,8 +77,9 @@ export default function AddressForm({ title, customerId, address, setAddress }) 
           id="combo-box-demo"
           options={addresses?.length > 0 ? addresses : []}
           getOptionLabel={(option) => `${option.first_name}, ${option.last_name}`}
+          getOptionKey={(option) => option.id}
           renderOption={(props, option) => (
-            <Box component="li" {...props}>
+            <Box key={option.id} component="li" {...props}>
               <Typography variant="subtitle1">{`${option.first_name}, ${option.last_name}`}</Typography>
               <Typography variant="subtitle2">{`${option.address1}, ${option.city}, ${option.state_or_province}, ${option.postal_code}, ${option.country}`}</Typography>
               <Typography variant="subtitle2">{`${option.phone}`}</Typography>
@@ -84,6 +91,7 @@ export default function AddressForm({ title, customerId, address, setAddress }) 
           size={"small"}
           value={address}
           sx={{ width: '100%', maxWidth: '400px' }}
+          isOptionEqualToValue={(option, value) => option.id === value.id}
         />
         
         {(address && address.first_name !== '') && (
@@ -202,7 +210,7 @@ export default function AddressForm({ title, customerId, address, setAddress }) 
                 size={"small"}
               />
 
-              <TextField
+              {/* <TextField
                 id="state"
                 name="state"
                 label="State/Province/Region"
@@ -211,6 +219,14 @@ export default function AddressForm({ title, customerId, address, setAddress }) 
                 onChange={handleUpdateField}
                 margin="normal"
                 size={"small"}
+              /> */}
+              <Autocomplete
+                id="state"
+                options={STATES}
+                getOptionLabel={(option) => option.code}
+                renderInput={(params) => <TextField {...params} label="State" margin="normal" size={"small"} />}
+                onChange={handleUpdateState}
+                value={address?.state ? STATES.find(state => state.label === address.state) : null}
               />
             </div>
 
@@ -273,7 +289,7 @@ export default function AddressForm({ title, customerId, address, setAddress }) 
               size={"small"}
               variant={"outlined"}
             >
-              Save
+              Close
             </Button>
           </FormControl>
         </Box>

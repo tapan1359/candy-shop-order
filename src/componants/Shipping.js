@@ -26,7 +26,7 @@ const createDefaultLineItem = () => ({
   sku: '',
   name: '',
   price: '',
-  quantity: '',
+  quantity: 1,
   tax: DEFAULT_TAX,
   total: '',
 });
@@ -91,6 +91,11 @@ export default function Shipping({customerId, products, consignment, updateConsi
 
   const handleManualInputChange = (value) => {
     setModelItem({...modelItem, name: value});
+  }
+
+  const handleResetModal = () => {
+    setModalOpen(false);
+    setModelItem(createDefaultLineItem());
   }
 
   return (
@@ -178,7 +183,7 @@ export default function Shipping({customerId, products, consignment, updateConsi
           Add Product
         </Button>
       </Box>
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+      <Modal open={modalOpen} onClose={handleResetModal}>
         <Box
           sx={{
             position: 'absolute',
