@@ -12,6 +12,7 @@ import { logOut, logIn } from './redux/user';
 
 import { Amplify } from 'aws-amplify';
 import { getCurrentUser, signOut } from 'aws-amplify/auth';
+import NewOrder from "./screens/newOrders/NewOrder";
 
 
 Amplify.configure({
@@ -35,7 +36,7 @@ export const theme = createTheme({
   },
   typography: {
     fontFamily: 'monospace',
-    fontSize: 11,
+    fontSize: 20,
     '@media (max-width: 600px)': {
       fontSize: 9,
     },
@@ -82,6 +83,7 @@ function App() {
             <Box sx={{ height: '64px' }} />
             {activePage === 'Orders' && <OrderIndex />}
             {activePage === 'New Orders' && <NewOrderIndex />}
+            {activePage === 'New OrdersV2' && <NewOrder />}
             {activePage === 'Misc' && <UpdateDataScreen />}
           </>
         ):

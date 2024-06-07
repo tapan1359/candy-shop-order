@@ -13,7 +13,7 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 
-const pages = ['Orders', 'New Orders', 'Misc', 'Logout'];
+const pages = ['Orders', 'New Orders', "New OrdersV2", 'Misc', 'Logout'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 const tag = process.env.REACT_APP_TAG;
 
@@ -71,7 +71,7 @@ function Header({ activePage, hndlePageChange }) {
               }}
             >
               {pages.map((page) => (
-                <MenuItem 
+                <MenuItem
                   key={page}
                   onClick={() => hndlePageChange(page)}
                 >
@@ -80,12 +80,13 @@ function Header({ activePage, hndlePageChange }) {
               ))}
             </Menu>
           </Box>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, gap: 4 }}>
             {pages.map((page) => (
               <Button
                 key={page}
                 onClick={() => hndlePageChange(page)}
-                sx={{ my: 2, color: 'white', display: 'block' }}
+                sx={{ my: 2, color: 'white', display: 'block', backgroundColor: activePage === page ? 'gray' : 'transparent' }}
+                variant={activePage === page ? 'contained' : 'text'}
               >
                 {page}
               </Button>

@@ -4,10 +4,12 @@ import { getAllCustomers } from '../../bigCommerce/customers/customers.get';
 import { getAllProducts } from '../../bigCommerce/products/products.get';
 import { setCustomers, setProducts } from '../../redux/bigCommerce/data';
 import LoadItem from '../../componants/LoadItem';
-import { Box, Button, TextField, Alert, Divider, Modal, Typography } from '@mui/material';
+import { Box, Button, TextField, Divider, Modal, Typography } from '@mui/material';
 import PrintModal from '../../componants/PrintPreview/PrintModal';
 import {getOrder, updateOrderBillingAddressZipCode} from "../../bigCommerce/orders/orders";
 import {processOrderPayment} from "../../bigCommerce/payment/payments";
+import CustomAlert from "../../CustomAlert";
+import {PaymentFormNew} from "../../componants/PaymentFormNew";
 
 function UpdateDataScreen() {
   const dispatch = useDispatch();
@@ -15,7 +17,6 @@ function UpdateDataScreen() {
   const [alertMessage, setAlertMessage] = React.useState(null);
   const [preview, setPreview] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = React.useState(false);
-  const [paymentInfo, setPaymentInfo] = React.useState(null);
   const [order, setOrder] = React.useState(null);
   const [orderId, setOrderId] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
@@ -60,7 +61,7 @@ function UpdateDataScreen() {
     }
   }
 
-  const handlePayment = async () => {
+  const handlePayment = async (paymentInfo) => {
     try {
       setLoading(true);
       setAlertMessage(null);
@@ -134,18 +135,11 @@ function UpdateDataScreen() {
   return (
     <div>
       {alertMessage && (
-        <Alert
+        <CustomAlert
           severity={alertMessage.severity}
           onClose={() => setAlertMessage(null)}
-          sx={{
-            position: 'fixed',
-            top: '16px',
-            right: '16px',
-            zIndex: 9999,
-          }}
-        >
-          {alertMessage.message}
-        </Alert>
+          message={alertMessage.message}
+        />
       )}
       <LoadItem buttonTitle="Update Customers" fetchDataFunc={handleUpdateCustomers} />
       <LoadItem buttonTitle="Update Products" fetchDataFunc={handleUpdateProducts} />
@@ -198,48 +192,7 @@ function UpdateDataScreen() {
               justifyContent: 'center',
             }}
           >
-            <Typography variant="h6">Payment Info</Typography>
-            <Typography variant="h6">Total: {order?.total_inc_tax}</Typography>
-            <TextField
-              label="Name on Card"
-              value={paymentInfo?.nameOnCard}
-              onChange={(event) => setPaymentInfo({...paymentInfo, nameOnCard: event.target.value})}
-            />
-            <TextField
-              label="Card Number"
-              type="number"
-              value={paymentInfo?.cardNumber}
-              onChange={(event) => setPaymentInfo({...paymentInfo, cardNumber: event.target.value})}
-            />
-            <TextField
-              label="CVV"
-              type="number"
-              value={paymentInfo?.cvv}
-              onChange={(event) => setPaymentInfo({...paymentInfo, cvv: event.target.value})}
-            />
-            <TextField
-              label="Expiry Month"
-              type="number"
-              value={paymentInfo?.expiryDate}
-              onChange={(event) => setPaymentInfo({...paymentInfo, expiryMonth: event.target.value})}
-            />
-            <TextField
-              label="Expiry Year"
-              type="number"
-              value={paymentInfo?.expiryDate}
-              onChange={(event) => setPaymentInfo({...paymentInfo, expiryYear: event.target.value})}
-            />
-            <TextField
-              label="Zip Code"
-              type="number"
-              value={paymentInfo?.zipcode}
-              onChange={(event) => setPaymentInfo({...paymentInfo, zipcode: event.target.value})}
-            />
-            <Button
-              onClick={handlePayment}
-            >
-              Pay
-            </Button>
+            <PaymentFormNew order={order} submitPayment={handlePayment} />
           </Box>
         </Modal>
     </div>

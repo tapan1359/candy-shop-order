@@ -7,6 +7,7 @@ import {createAddressAPI} from '../bigCommerce/customers/addresses.create';
 import {getCustomerById} from '../bigCommerce/customers/customers.get';
 import {updateCustomerById} from '../redux/bigCommerce/data';
 import {STATES} from '../../src/constants'
+import CustomAlert from "../CustomAlert";
 
 
 const billingInfoEmpty = {
@@ -15,9 +16,10 @@ const billingInfoEmpty = {
   address1: '',
   address2: '',
   city: '',
-  state: {code: 'MD', value: 'Maryland'},
+  state_or_province: 'Maryland',
   postal_code: '',
   phone: '',
+  country_code: "US"
 };
 
 export default function CreateAddress({buttonName, customerId, setParentAddress = null}) {
@@ -31,27 +33,16 @@ export default function CreateAddress({buttonName, customerId, setParentAddress 
     setAddress({ ...address, [e.target.name]: e.target.value });
   }
 
-  useEffect(() => {
-    console.log(address);
-  }, [address]);
 
-
-  const handleUpdateState = (_, state) => {
-    console.log(state?.value);
-    if (state) setAddress({ ...address, state });
+  const handleUpdateState = (_, newValue) => {
+    if (newValue) setAddress({ ...address, state_or_province: newValue.label });
   }
 
   const handleCreateAddress = async () => {
     setAlertMessage(null);
 
     let localCopyAddress = {...address};
-    
-    console.log(localCopyAddress);
 
-    localCopyAddress.country_code = "US";
-    localCopyAddress.state_or_province = localCopyAddress.state.label;
-
-    console.log(localCopyAddress);
 
     if (localDelivery) {
       localCopyAddress.city = 'Baltimore';
@@ -64,7 +55,6 @@ export default function CreateAddress({buttonName, customerId, setParentAddress 
       return;
     }
 
-
     let result = await createAddressAPI(localCopyAddress, customerId);
     if (result.address) {
       let r = await getCustomerById(customerId);
@@ -72,7 +62,7 @@ export default function CreateAddress({buttonName, customerId, setParentAddress 
       if (setParentAddress) {
         setParentAddress(result.address);
       }
-      setAddress(null);
+      setAddress(billingInfoEmpty);
       setModalOpen(false);
       setAlertMessage({severity: "success", message: "Address created successfully!"});
     } else if (result.error) {
@@ -85,18 +75,11 @@ export default function CreateAddress({buttonName, customerId, setParentAddress 
   return (
     <>
       {alertMessage && (
-        <Alert
+        <CustomAlert
           severity={alertMessage.severity}
           onClose={() => setAlertMessage(null)}
-          sx={{
-            position: 'fixed',
-            top: '16px',
-            right: '16px',
-            zIndex: 9999,
-          }}
-        >
-          {alertMessage.message}
-        </Alert>
+          message={alertMessage.message}
+        />
       )}
     <Box
       component="form"
@@ -212,12 +195,12 @@ export default function CreateAddress({buttonName, customerId, setParentAddress 
               />
 
               <Autocomplete
-                id="state"
+                id="state_or_province"
                 options={STATES}
                 getOptionLabel={(option) => option.code}
                 renderInput={(params) => <TextField {...params} label="State" margin="normal" size={"small"} />}
                 onChange={handleUpdateState}
-                value={address?.state}
+                value={address?.state_or_province ? STATES.find(state => state.label === address.state_or_province) : null}
               />
             </div>
 

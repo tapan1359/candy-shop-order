@@ -5,6 +5,7 @@ import {
 import {useDispatch} from 'react-redux';
 import {addCustomer} from '../redux/bigCommerce/data';
 import {createCustomerAPI} from '../bigCommerce/customers/customers.create';
+import CustomAlert from "../CustomAlert";
 
 
 const createCustomerModel =  () => {
@@ -16,11 +17,11 @@ const createCustomerModel =  () => {
   }
 }
 
-const CreateCustomer = ({setCustomer}) => {
+const CreateCustomer = ({setCustomer, setSelectedBillingAddress}) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [newCustomer, setNewCustomer] = React.useState(createCustomerModel());
   const [alertMessage, setAlertMessage] = React.useState(null);
-  const [defaultAddressSwitchChecked, setDefaultAddressSwitchChecked] = React.useState(false);
+  const [defaultAddressSwitchChecked, setDefaultAddressSwitchChecked] = React.useState(true);
   const dispatch = useDispatch();
   
   const handleCreateNewCustomer = (e) => {
@@ -58,6 +59,9 @@ const CreateCustomer = ({setCustomer}) => {
     let {customer, error} = await createCustomerAPI(updatedCustomer);
     if (customer) {
       setCustomer(customer);
+      if (customer.addresses.length > 0) {
+        setSelectedBillingAddress(customer.addresses[0]);
+      }
       dispatch(addCustomer(customer));
       setModalOpen(false);
       setNewCustomer(createCustomerModel());
@@ -76,18 +80,11 @@ const CreateCustomer = ({setCustomer}) => {
   return (
     <>
       {alertMessage && (
-        <Alert
+        <CustomAlert
           severity={alertMessage.severity}
           onClose={() => setAlertMessage(null)}
-          sx={{
-            position: 'fixed',
-            top: '16px',
-            right: '16px',
-            zIndex: 9999,
-          }}
-        >
-          {alertMessage.message}
-        </Alert>
+          message={alertMessage.message}
+        />
       )}
       <Box
       component="form"

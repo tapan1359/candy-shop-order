@@ -21,9 +21,11 @@ export const ShippingOptions = ({APIConsignments, setShippingOption}) => {
       >
         {APIConsignments.map((consignment, i) => (
           <Box
+            key={i}
             component="form"
             sx={{
               width: 500,
+              borderRight: 1,
             }}
           >
             <Typography variant="subtitle1">{`${consignment.shipping_address.first_name}, ${consignment.shipping_address.last_name}`}</Typography>

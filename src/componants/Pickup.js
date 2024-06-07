@@ -62,7 +62,7 @@ export default function Pickup({products, consignment, updateConsignmentItems}) 
 
   const handleModalAddItem = () => {
     if (modelItem) {
-      consignment.items = [...consignment.items, modelItem];
+      updateConsignmentItems({items: [...consignment.items, modelItem]});
     }
     setModalOpen(false);
     setModelItem(createDefaultLineItem());
@@ -70,7 +70,7 @@ export default function Pickup({products, consignment, updateConsignmentItems}) 
 
   const removeLineItem = (index) => {
     consignment.items.splice(index, 1);
-    updateConsignmentItems(consignment.items);
+    updateConsignmentItems({items: consignment.items});
   }
 
   const handleUpdateField = (e) => {

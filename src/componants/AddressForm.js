@@ -11,7 +11,7 @@ const billingInfoEmpty = {
   address1: '',
   address2: '',
   city: '',
-  state: '',
+  state_or_province: '',
   postal_code: '',
   country: '',
   country_code: '',
@@ -24,26 +24,27 @@ export default function AddressForm({ title, customerId, address, setAddress }) 
 
   const addresses = useSelector((state) => state.data.customers.find((c) => c.id === customerId)?.addresses);
 
-  // useEffect(() => {
-  //   setAddress(null);
-  // }, [addresses]);
+  useEffect(() => {
+    console.log("AddressForm", address);
+  }, []);
 
 
-  const handleSelectBilling = async (address) => {
-    if (address) {
+  const handleSelectBilling = async (newAddress) => {
+    console.log("handleSelectBillingCalled", newAddress);
+    if (newAddress) {
       setAddress({
-        id: address.id,
-        first_name: address.first_name,
-        last_name: address.last_name,
-        address1: address.address1,
-        address2: address.address2,
-        city: address.city,
-        state: address.state_or_province,
-        postal_code: address.postal_code,
-        country: address.country,
-        country_code: address.country_code,
-        phone: address.phone,
-        giftMessage: address.giftMessage,
+        id: newAddress.id,
+        first_name: newAddress.first_name,
+        last_name: newAddress.last_name,
+        address1: newAddress.address1,
+        address2: newAddress.address2,
+        city: newAddress.city,
+        state_or_province: newAddress.state_or_province,
+        postal_code: newAddress.postal_code,
+        country: newAddress.country,
+        country_code: newAddress.country_code,
+        phone: newAddress.phone,
+        giftMessage: newAddress.giftMessage,
       });
     } else {
       setAddress(billingInfoEmpty);
@@ -55,7 +56,7 @@ export default function AddressForm({ title, customerId, address, setAddress }) 
   }
 
   const handleUpdateState = (_, newValue) => {
-    setAddress({ ...address, state: newValue.label });
+    setAddress({ ...address, state_or_province: newValue.label });
   };
 
 
@@ -98,7 +99,7 @@ export default function AddressForm({ title, customerId, address, setAddress }) 
           <Box>
             <Typography variant="subtitle1">Selected Address:</Typography>
             <Typography variant="subtitle2">{`${address.first_name}, ${address.last_name}`}</Typography>
-            <Typography variant="subtitle2">{`${address.address1}, ${address.city}, ${address.state}, ${address.postal_code}, ${address.country}`}</Typography>
+            <Typography variant="subtitle2">{`${address.address1}, ${address.city}, ${address.state_or_province}, ${address.postal_code}, ${address.country}`}</Typography>
             <Typography variant="subtitle2">{`${address.phone}`}</Typography>
             <Typography variant="subtitle2">{`Gift Message: ${address.giftMessage}`}</Typography>
             <Button
@@ -221,12 +222,12 @@ export default function AddressForm({ title, customerId, address, setAddress }) 
                 size={"small"}
               /> */}
               <Autocomplete
-                id="state"
+                id="state_or_province"
                 options={STATES}
                 getOptionLabel={(option) => option.code}
                 renderInput={(params) => <TextField {...params} label="State" margin="normal" size={"small"} />}
                 onChange={handleUpdateState}
-                value={address?.state ? STATES.find(state => state.label === address.state) : null}
+                value={address?.state_or_province ? STATES.find(state => state.label === address.state_or_province) : null}
               />
             </div>
 
