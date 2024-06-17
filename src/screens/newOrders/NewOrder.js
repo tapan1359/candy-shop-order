@@ -397,7 +397,15 @@ export default function NewOrder() {
       }}>
         <Stepper activeStep={activeStep}>
           {steps.map((label, index) => (
-            <Step key={label}>
+            <Step
+              key={label}
+              sx={{
+                border: '1px solid black',
+                padding: 2,
+                borderRadius: 5,
+                backgroundColor: activeStep === index ? 'gray' : 'white',
+              }}
+            >
               <StepLabel>{label}</StepLabel>
             </Step>
           ))}

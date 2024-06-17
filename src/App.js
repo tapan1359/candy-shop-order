@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import './App.css';
-import { Box, ThemeProvider, createTheme} from '@mui/material';
+import {Box, ThemeProvider, createTheme, CssBaseline} from '@mui/material';
 
 import Header from './componants/Header';
 import OrderIndex from './screens/orders/OrderIndex';
@@ -37,6 +37,9 @@ export const theme = createTheme({
   typography: {
     fontFamily: 'monospace',
     fontSize: 20,
+    allVariants: {
+      fontWeight: 700,
+    },
     '@media (max-width: 600px)': {
       fontSize: 9,
     },
@@ -76,6 +79,7 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
+      <CssBaseline />
       <Box className="App">
         {loggedIn ? (
           <>
