@@ -201,6 +201,7 @@ export default function CreateAddress({buttonName, customerId, setParentAddress 
                 renderInput={(params) => <TextField {...params} label="State" margin="normal" size={"small"} />}
                 onChange={handleUpdateState}
                 value={address?.state_or_province ? STATES.find(state => state.label === address.state_or_province) : null}
+                sx={{ width: 250 }}
               />
             </div>
 

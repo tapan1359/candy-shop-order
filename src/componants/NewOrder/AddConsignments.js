@@ -108,6 +108,10 @@ export default function AddConsignments({
           <Button
             onClick={addConsignment}
             variant={"contained"}
+            sx={{
+              backgroundColor: 'red',
+              width: '20%',
+            }}
           >
             Add New Products
           </Button>

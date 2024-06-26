@@ -149,6 +149,7 @@ class ComponentToPrint extends React.Component {
         <Typography variant="subtitle2">{billingAddress.city}, {billingAddress.state}, {billingAddress.zip}</Typography>
         <Typography variant="subtitle2">Phone: {billingAddress.phone}</Typography>
         <Typography variant="subtitle2">Email: {billingAddress.email}</Typography>
+
         </Box>
         <Divider sx={{ my: 2 }} />
         {this.renderShipping(consignments)} 

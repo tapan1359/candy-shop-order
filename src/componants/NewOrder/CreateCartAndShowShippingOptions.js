@@ -25,6 +25,8 @@ export default function CreateCartAndShowShippingOptions({
         flexDirection: 'column',
         gap: 2,
         padding: 2,
+        justifyContent: 'center',
+        alignItems: 'center',
       }}
     >
       <Button
@@ -32,6 +34,10 @@ export default function CreateCartAndShowShippingOptions({
         onClick={handleCreateShippingCart}
         variant={"contained"}
         disabled={loading}
+        sx={{
+          backgroundColor: 'red',
+          width: '20%',
+        }}
       >
         {loading ? "Loading..." : buttonTitle}
       </Button>

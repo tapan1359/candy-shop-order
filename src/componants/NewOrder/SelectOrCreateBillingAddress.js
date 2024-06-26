@@ -10,7 +10,7 @@ export default function SelectOrCreateBillingAddress({
   return (
     <div>
       <AddressForm title={"Billing Address"} customerId={selectedCustomer?.id} address={selectedBillingAddress} setAddress={setSelectedBillingAddress} />
-      <CreateAddress buttonName={"New Address"} customerId={selectedCustomer?.id} />
+      <CreateAddress buttonName={"New Address"} customerId={selectedCustomer?.id} setParentAddress={setSelectedBillingAddress} />
     </div>
   );
 }

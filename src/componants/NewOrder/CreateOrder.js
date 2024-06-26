@@ -19,6 +19,8 @@ export default function CreateOrder({
         flexDirection: 'column',
         gap: 2,
         padding: 2,
+        justifyContent: 'center',
+        alignItems: 'center',
       }}
     >
       <Button
@@ -26,6 +28,11 @@ export default function CreateOrder({
         onClick={handleCreateOrderLocally}
         variant={"contained"}
         disabled={loading}
+        color={"red"}
+        sx={{
+          backgroundColor: 'red',
+          width: '20%',
+        }}
       >
         {loading ? "Loading..." : "Create Order"}
       </Button>

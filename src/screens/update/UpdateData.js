@@ -13,7 +13,7 @@ import {PaymentFormNew} from "../../componants/PaymentFormNew";
 
 function UpdateDataScreen() {
   const dispatch = useDispatch();
-  const [printMessage, setPrintMessage] = useState(null);
+  const [printMessage, setPrintMessage] = useState("");
   const [alertMessage, setAlertMessage] = React.useState(null);
   const [preview, setPreview] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = React.useState(false);
@@ -43,7 +43,6 @@ function UpdateDataScreen() {
 
   const closePreviewModal = () => {
     setPreview(false);
-    setPrintMessage(null);
   }
 
   const openPaymentModal = async () => {
@@ -154,10 +153,11 @@ function UpdateDataScreen() {
             fullWidth
             onChange={(e) => setPrintMessage(e.target.value)}
           />
-          <Button onClick={() => setPreview(true)} sx={{ alignSelf: 'start' }}>Print</Button>
+          <Button onClick={() => setPreview(true)} disabled={printMessage === ""} sx={{ alignSelf: 'start' }}>Print</Button>
+          <Button onClick={() => setPrintMessage("")} sx={{ alignSelf: 'start' }}  disabled={printMessage === ""}>Clear</Button>
         </Box>
       </Box>
-      {preview && <PrintModal text={printMessage} closePreview={closePreviewModal} />}
+      {(preview && printMessage) && <PrintModal text={printMessage} closePreview={closePreviewModal} />}
       <Divider />
       <Typography variant="h6">Payment</Typography>
       <TextField
