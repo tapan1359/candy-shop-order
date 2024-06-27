@@ -21,7 +21,7 @@ class ComponentToPrint extends React.Component {
   renderPickups(consignments) {
     return consignments.map((consignment, consignmentIndex) => (
       <React.Fragment key={consignmentIndex}>
-        <Typography>Pickups</Typography>
+        {(consignment.pickups && consignment.pickups.length > 0) && <Typography>Pickups</Typography>}
         {consignment.pickups && consignment.pickups.length > 0 ? (
           <TableContainer sx={{ my: 2 }}>
             <Table aria-label="pickup details">
@@ -46,14 +46,16 @@ class ComponentToPrint extends React.Component {
                           <Typography variant="subtitle2">{pickup.location.address_line_1}</Typography>
                           <Typography variant="subtitle2">{`${pickup.location.city}, ${pickup.location.state}, ${pickup.location.postal_code}`}</Typography>
                           <Typography variant="subtitle2">{`Method: ${pickup.pickup_method_display_name}`}</Typography>
-                          <Divider sx={{ my: 1 }} />
+                          {pickup.form_fields.map((field, fieldIndex) => (
+                            <Typography variant="subtitle2" key={fieldIndex}>{`${field.name}: ${field.value}`}</Typography>
+                          ))}
                         </TableCell>
                       )}
                       <TableCell align="right" sx={{color: 'red', fontSize: '1.5em'}}>{lineItem.quantity}</TableCell>
                       <TableCell align="right">{lineItem.sku}</TableCell>
                       <TableCell align="right">{lineItem.name}</TableCell>
-                      <TableCell align="right">${lineItem.price_ex_tax}</TableCell>
-                      <TableCell align="right">${lineItem.total_ex_tax}</TableCell>
+                      <TableCell align="right">${parseFloat(lineItem.price_ex_tax).toFixed(2)}</TableCell>
+                      <TableCell align="right">${parseFloat(lineItem.total_ex_tax).toFixed(2)}</TableCell>
                     </TableRow>
                   ))}
                 </React.Fragment>
@@ -61,8 +63,7 @@ class ComponentToPrint extends React.Component {
               </TableBody>
             </Table>
           </TableContainer>
-        ): <Typography>No Pickups Found</Typography>}
-        <Divider sx={{ my: 2 }} />
+        ): null}
         
       </React.Fragment>
     ));
@@ -72,7 +73,7 @@ class ComponentToPrint extends React.Component {
   renderShipping(consignments) {
     return consignments.map((consignment, consignmentIndex) => (
       <React.Fragment key={consignmentIndex}>
-        <Typography>Shipping</Typography>
+        {(consignment.shipping && consignment.shipping.length > 0) && <Typography>Shipping</Typography>}
         {consignment.shipping && consignment.shipping.length > 0 ? (
           <TableContainer>
             <Table aria-label="shipping details">
@@ -98,7 +99,6 @@ class ComponentToPrint extends React.Component {
                           <Typography variant="subtitle2">{shippingItem.street_1}</Typography>
                           <Typography variant="subtitle2">{`${shippingItem.city}, ${shippingItem.state}, ${shippingItem.zip}`}</Typography>
                           <Typography variant="subtitle2">{`Method: ${shippingItem.shipping_method}`}</Typography>
-                          <Divider sx={{ my: 1 }} />
                           {shippingItem.form_fields.map((field, fieldIndex) => (
                             <Typography variant="subtitle2" key={fieldIndex}>{`${field.name}: ${field.value}`}</Typography>
                           ))}
@@ -107,8 +107,8 @@ class ComponentToPrint extends React.Component {
                       <TableCell align="right" sx={{color: 'red', fontSize: '1.5em'}}>{lineItem.quantity}</TableCell>
                       <TableCell align="right">{lineItem.sku}</TableCell>
                       <TableCell align="right">{lineItem.name}</TableCell>
-                      <TableCell align="right">${lineItem.price_ex_tax}</TableCell>
-                      <TableCell align="right">${lineItem.total_ex_tax}</TableCell>
+                      <TableCell align="right">${parseFloat(lineItem.price_ex_tax).toFixed(2)}</TableCell>
+                      <TableCell align="right">${parseFloat(lineItem.total_ex_tax).toFixed(2)}</TableCell>
                     </TableRow>
                   ))}
                 </React.Fragment>
@@ -116,8 +116,7 @@ class ComponentToPrint extends React.Component {
               </TableBody>
             </Table>
           </TableContainer>
-        ): <Typography>No Shipping Found</Typography>}
-        <Divider sx={{ my: 2 }} />
+        ): null}
         
       </React.Fragment>
     ));
@@ -129,58 +128,108 @@ class ComponentToPrint extends React.Component {
     let consignments = order.consignments || [];
 
     return (
-      <>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Typography variant="h4">Invoice</Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            width: '100%',
+            mb: 3, // Adding space between sections
+            borderBottom: 3,
+            borderColor: 'gray',
+          }}
+        >
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'left', gap: 2 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1 }}>
+              <Typography variant="body1" sx={{ color: 'gray' }}>Order Number:</Typography>
+              <Typography variant="body1" sx={{ color: 'black' }}>{order.id}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1 }}>
+              <Typography variant="body1" sx={{ color: 'gray' }}>Order Date:</Typography>
+              <Typography variant="body1" sx={{ color: 'black' }}>{moment(order.date_created).format("Do MMM YYYY")}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1 }}>
+              <Typography variant="body1" sx={{ color: 'gray' }}>Status:</Typography>
+              <Typography variant="body1" sx={{ color: 'red' }}>{order.status}</Typography>
+            </Box>
+          </Box>
+          <Box>
+            <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'gray' }}>Billing Address</Typography>
+            <Typography variant="subtitle2">{billingAddress.first_name} {billingAddress.last_name}</Typography>
+            <Typography variant="subtitle2">{billingAddress.street_1}</Typography>
+            <Typography variant="subtitle2">{billingAddress.city}, {billingAddress.state}, {billingAddress.zip}</Typography>
+            <Typography variant="subtitle2">Phone: {billingAddress.phone}</Typography>
+            <Typography variant="subtitle2">Email: {billingAddress.email}</Typography>
+            {billingAddress.form_fields.map((field, fieldIndex) => (
+              <Typography variant="subtitle2" key={fieldIndex}>{`${field.name}: ${field.value}`}</Typography>
+            ))}
+          </Box>
+        </Box>
         <Box
           sx={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
+            borderBottom: 3,
+            borderColor: 'gray',
+            mb: 3,
           }}
         >
-        <Typography variant="h4">Invoice</Typography>
-        <Typography variant="body1">Order Number: {order.id}</Typography>
-        <Typography variant="subtitle2">Order Date: {moment(order.date_created).format("Do MMM YYYY") }</Typography>
-        <Typography variant="body1" sx={{ color: 'red'}} >Status: {order.status}</Typography>
-        <Divider sx={{ my: 1 }} />
-        <Typography variant="body2">Billing Address</Typography>
-        <Typography variant="subtitle2">{billingAddress.first_name} {billingAddress.last_name}</Typography>
-        <Typography variant="subtitle2">{billingAddress.street_1}</Typography>
-        <Typography variant="subtitle2">{billingAddress.city}, {billingAddress.state}, {billingAddress.zip}</Typography>
-        <Typography variant="subtitle2">Phone: {billingAddress.phone}</Typography>
-        <Typography variant="subtitle2">Email: {billingAddress.email}</Typography>
-
+          {this.renderShipping(consignments)}
+          {this.renderPickups(consignments)}
         </Box>
-        <Divider sx={{ my: 2 }} />
-        {this.renderShipping(consignments)} 
-        {this.renderPickups(consignments)} 
-        <TableContainer>
-          <Table aria-label="invoice totals">
-            <TableBody>
-              <TableRow sx={{ '& > *': { py: '3px' } }}>
-                <TableCell>Subtotal:</TableCell>
-                <TableCell align="right">{`$${order.subtotal_ex_tax} USD`}</TableCell>
-              </TableRow>
-              {consignments.map((consignment, index) => (
-                consignment.shipping.map((shipItem, shipIndex) => (
-                  <TableRow sx={{ '& > *': { py: '3px' } }} key={`ship-${index}-${shipIndex}`}>
-                    <TableCell>{`Shipping - Destination #${index + 1}${consignment.shipping.length > 1 ? ` (Item ${shipIndex + 1})` : ''}:`}</TableCell>
-                    <TableCell align="right">{`$${shipItem.cost_inc_tax} USD`}</TableCell>
-                  </TableRow>
-                ))
-              ))}
-              <TableRow sx={{ '& > *': { py: '3px' } }}>
-                <TableCell>Tax:</TableCell>
-                <TableCell align="right">{`$${order.total_tax} USD`}</TableCell>
-              </TableRow>
-              <TableRow sx={{ '& > *': { py: '3px' } }}>
-                <TableCell>Grand total:</TableCell>
-                <TableCell align="right">{`$${order.total_inc_tax} USD`}</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-end', // Align to the right
+            justifyContent: 'center',
+            width: '100%', // Ensuring full width
+            p: 2, // Adding padding
+          }}
+        >
+          <Box>
+          <TableContainer>
+            <Table aria-label="invoice totals">
+              <TableBody>
+                <TableRow sx={{ '& > *': { py: '3px' } }}>
+                  <TableCell>Subtotal:</TableCell>
+                  <TableCell align="right">{`$${parseFloat(order.subtotal_ex_tax).toFixed(2)}`}</TableCell>
+                </TableRow>
+                {consignments.map((consignment, index) => (
+                  consignment.shipping.map((shipItem, shipIndex) => (
+                    <TableRow sx={{ '& > *': { py: '3px' } }} key={`ship-${index}-${shipIndex}`}>
+                      <TableCell>{`Shipping - Destination #${index + 1}${consignment.shipping.length > 1 ? ` (Item ${shipIndex + 1})` : ''}:`}</TableCell>
+                      <TableCell align="right">{`$${parseFloat(shipItem.cost_inc_tax).toFixed(2)}`}</TableCell>
+                    </TableRow>
+                  ))
+                ))}
+                <TableRow sx={{ '& > *': { py: '3px' } }}>
+                  <TableCell>Tax:</TableCell>
+                  <TableCell align="right">{`$${parseFloat(order.total_tax).toFixed(2)}`}</TableCell>
+                </TableRow>
+                <TableRow sx={{ '& > *': { py: '3px' } }}>
+                  <TableCell>Grand total:</TableCell>
+                  <TableCell align="right">{`$${parseFloat(order.total_inc_tax).toFixed(2)}`}</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+        </Box>
+
+      </Box>
     );
   }
 }
@@ -228,10 +277,10 @@ const PrintInvoice = ({order=null}) => {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center',
-            overflow: 'auto',
-            maxHeight: '90vh',
-            paddingTop: 15,
+            justifyContent: 'flex-start', // Changed from center to flex-start
+            overflowY: 'auto', // Added to ensure vertical scroll
+            height: "90vh",
+            maxHeight: "90vh", // Ensuring the modal doesn't exceed viewport height
           }}
         >
             <div>
@@ -251,6 +300,7 @@ const PrintInvoice = ({order=null}) => {
               display: 'flex',
               justifyContent: 'flex-end',
               paddingRight: 4,
+              width: '100%', // Ensures full width for the button section
             }}
           >
             <Button size={'large'} variant="contained" onClick={handlePrint}>Print</Button>
