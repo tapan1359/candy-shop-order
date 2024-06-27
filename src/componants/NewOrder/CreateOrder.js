@@ -28,7 +28,6 @@ export default function CreateOrder({
         onClick={handleCreateOrderLocally}
         variant={"contained"}
         disabled={loading}
-        color={"red"}
         sx={{
           backgroundColor: 'red',
           width: '20%',

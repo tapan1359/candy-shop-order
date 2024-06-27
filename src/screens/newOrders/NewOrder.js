@@ -17,6 +17,7 @@ import {
 import {setCart, setCheckout, setOrder} from "../../redux/bigCommerce/newOrderSlice";
 import {processOrderPayment} from "../../bigCommerce/payment/payments";
 import Cart from "../../componants/Cart";
+import PaymentSuccessFull from "../../componants/PaymentSuccessFull";
 
 
 export default function NewOrder() {
@@ -52,6 +53,8 @@ export default function NewOrder() {
   // step 4
   const [orderId, setOrderId] = React.useState(null);
   const [orderCreated, setOrderCreated] = React.useState(false);
+
+  const [paymentSuccess, setPaymentSuccess] = React.useState(false);
 
   useEffect(() => {
     console.log("pickup", activeStep);
@@ -259,8 +262,7 @@ export default function NewOrder() {
         await processOrderPayment({orderId, paymentInfo});
       }
 
-      setAlertMessage({message: "Payment processed!", severity: "success"});
-      resetPage();
+      setPaymentSuccess(true);
 
     } catch (error) {
       const data = error.response.data;
@@ -285,6 +287,7 @@ export default function NewOrder() {
     setFullfillmentType("shipping");
     setActiveStep(0);
     setAlertMessage({severity: "success", message: "Page Reset!"})
+    setPaymentSuccess(false);
   }
 
 
@@ -420,6 +423,7 @@ export default function NewOrder() {
           </Button>
         </Box>
       </Box>
+      {paymentSuccess && <PaymentSuccessFull onStartNewOrder={resetPage}/>}
       {/*<Box*/}
       {/*  sx={{*/}
       {/*    display: 'flex',*/}
