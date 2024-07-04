@@ -113,7 +113,7 @@ export default function AddConsignments({
               width: '40%',
             }}
           >
-            ADD NEW SHIPPING AND PRODUCTS
+            ADD ADDITIONAL SHIPPING ADDRESS AND PRODUCTS
           </Button>
         </>
       )}
