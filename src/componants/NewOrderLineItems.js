@@ -3,8 +3,6 @@ import {
   TextField, Button, Box, Table, TableBody, TableCell, MenuItem, TableContainer, TableHead, TableRow, Select, Autocomplete,
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
-import { getProducts } from '../bigCommerce/products/products.get';
-import { setCart } from '../redux/bigCommerce/newOrderSlice';
 
 const createDefaultLineItem = () => ({
   image: '',

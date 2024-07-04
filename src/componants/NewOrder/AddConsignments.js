@@ -110,10 +110,10 @@ export default function AddConsignments({
             variant={"contained"}
             sx={{
               backgroundColor: 'red',
-              width: '20%',
+              width: '40%',
             }}
           >
-            Add New Products
+            ADD NEW SHIPPING AND PRODUCTS
           </Button>
         </>
       )}

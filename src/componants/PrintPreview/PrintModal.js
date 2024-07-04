@@ -10,6 +10,7 @@ const PrintPreview = ({text, closePreview}) => {
     const [isPrintMode, setIsPrintMode] = useState(false);
     const [lineHeight, setLineHeight] = useState(1);
     const [activeTab, setActiveTab] = useState(0);
+    const [orientation, setOrientation] = useState('vertical');
    
     useEffect(() => {
       CheckStringLength(text);
@@ -46,6 +47,10 @@ const PrintPreview = ({text, closePreview}) => {
         setLineHeight(1.5);
       }
     };
+
+  const toggleOrientation = () => {
+    setOrientation(prev => prev === 'vertical' ? 'horizontal' : 'vertical');
+  };
   
     return (
       <div>
@@ -56,7 +61,7 @@ const PrintPreview = ({text, closePreview}) => {
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: { xs: '90%', sm: 300 }, // Responsive width
+              width: { xs: '90%', sm: 300, md: 400 }, // Responsive width
               bgcolor: 'background.paper',
               borderRadius: '8px',
               boxShadow: 24,
@@ -89,6 +94,7 @@ const PrintPreview = ({text, closePreview}) => {
                 isPrintMode={isPrintMode}
                 lineHeight={lineHeight}
                 messageChange={(message) => CheckStringLength(message)}
+                orientation={orientation}
               />
             )}
   
@@ -102,7 +108,7 @@ const PrintPreview = ({text, closePreview}) => {
                   onChange={(e) => setFz(e.target.value)}
                 />
             </div>
-  
+            <Button onClick={toggleOrientation}>Rotate</Button>
             <Button onClick={() => closePreview()}>Close</Button>
             <Button onClick={togglePrintMode}>Toggle Print Mode</Button>
             <Button onClick={handlePrint}>Print</Button>

@@ -8,20 +8,21 @@ class ComponentToPrintV1 extends React.Component {
       editableMessage: this.props.message,
     };
   }
-  
-  
+
+
   handleChange = (event) => {
     this.setState({ editableMessage: event.target.value });
     if (this.props.messageChange) {
       this.props.messageChange(event.target.value);
     }
   };
-  
+
   render() {
+    const isVertical = this.props.orientation === 'vertical';
     return (
       <div className={'cardPrintComponent'} style={{
-        height: '3.5in', // Outer box height
-        width: '2.25in', // Outer box width
+        height: isVertical ? '3.5in' : '2.25in', // Outer box height
+        width: isVertical ? '2.25in' : '3.5in', // Outer box width
         display: 'flex',
         justifyContent: 'center', // Align text container horizontally in the middle
         alignItems: 'center', // Align text container vertically in the middle
@@ -32,10 +33,10 @@ class ComponentToPrintV1 extends React.Component {
       }}>
         <div style={{
           position: 'absolute',
-          top: '0.20in', // Half of the total height reduction to center the content
-          left: '0.4in', // Half of the total width reduction to center the content
-          height: '3.0in', // Reduced height (2.25in - 0.6in)
-          width: '1.65in', // Reduced width (3.5in - 0.5in)
+          top: isVertical ? '0.20in' : '0.4in', // Half of the total height reduction to center the content
+          left: isVertical ? '0.4in' : '0.20in',  // Half of the total width reduction to center the content
+          height: isVertical ? '3.0in' : '1.65in', // Reduced height (2.25in - 0.6in)
+          width: isVertical ? '1.65in' : '3.0in', // Reduced width (3.5in - 0.5in)
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
@@ -48,9 +49,9 @@ class ComponentToPrintV1 extends React.Component {
             style={{
               textAlign: 'center',
               verticalAlign: 'middle',
-              width: '3.0in',
-              height: '1.65in',
-              transform: 'rotate(-90deg)',
+              width: isVertical ? '3.0in' : '3.0in',
+              height: isVertical ? '1.65in' : '1.65in',
+              transform: isVertical ? 'rotate(-90deg)' : 'none',
               transformOrigin: 'center center',
               backgroundColor: 'transparent',
               resize: 'none',
