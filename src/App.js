@@ -13,6 +13,9 @@ import { logOut, logIn } from './redux/user';
 import { Amplify } from 'aws-amplify';
 import { getCurrentUser, signOut } from 'aws-amplify/auth';
 import NewOrder from "./screens/newOrders/NewOrder";
+import {getAllCustomers} from "./bigCommerce/customers/customers.get";
+import {setCustomers, setProducts} from "./redux/bigCommerce/data";
+import {getAllProducts} from "./bigCommerce/products/products.get";
 
 
 Amplify.configure({
@@ -75,7 +78,34 @@ function App() {
     });
   }, []);
 
+  useEffect(() => {
+    handleUpdateProducts();
+    handleUpdateCustomers();
+    const intervalId = setInterval(() => {
+      handleUpdateProducts();
+      handleUpdateCustomers();
+    }, 300000);
 
+    return () => clearInterval(intervalId); // Clear interval on component unmount
+  }, []);
+
+  const handleUpdateCustomers = async () => {
+    try {
+      const customers = await getAllCustomers();
+      dispatch(setCustomers(customers));
+    } catch (error) {
+      console.log('error updating customers', error)
+    }
+  };
+
+  const handleUpdateProducts = async () => {
+    try {
+      const products = await getAllProducts();
+      dispatch(setProducts(products));
+    } catch (error) {
+      console.log('error updating products', error)
+    }
+  };
 
   return (
     <ThemeProvider theme={theme}>
