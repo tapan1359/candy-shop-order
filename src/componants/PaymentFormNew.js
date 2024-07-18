@@ -1,12 +1,21 @@
 import {Box, Button, TextField, Typography} from "@mui/material";
 import React from "react";
 
+
 export function PaymentFormNew({
-   order,
-   submitPayment,
+  order,
+  customerName = null,
+  billingZipCode = null,
+  submitPayment,
 }) {
 
-  const [paymentInfo, setPaymentInfo] = React.useState(null);
+  const [paymentInfo, setPaymentInfo] = React.useState({
+    nameOnCard: customerName,
+    cardNumber: '',
+    expiryDate: '',
+    cvv: '',
+    zipcode: billingZipCode,
+  });
   const [loading, setLoading] = React.useState(false);
 
   const handleSubmit = async () => {
@@ -17,9 +26,20 @@ export function PaymentFormNew({
       updatedPaymentInfo = {...paymentInfo, expiryMonth, expiryYear: fullExpiryYear};
     }
     setLoading(true);
-    await submitPayment(updatedPaymentInfo);
-    setLoading(false);
-    setPaymentInfo(null)
+    try {
+      await submitPayment(updatedPaymentInfo);
+      setLoading(false);
+      setPaymentInfo({
+        nameOnCard: customerName,
+        cardNumber: '',
+        expiryDate: '',
+        cvv: '',
+        zipcode: billingZipCode,
+      })
+    } catch (error) {
+      setLoading(false);
+    }
+
   };
 
   const handleExpiryDateChange = (event) => {
@@ -60,16 +80,16 @@ export function PaymentFormNew({
         onChange={(event) => setPaymentInfo({...paymentInfo, cardNumber: event.target.value})}
       />
       <TextField
-        label="CVV"
-        type="number"
-        value={paymentInfo?.cvv}
-        onChange={(event) => setPaymentInfo({...paymentInfo, cvv: event.target.value})}
-      />
-      <TextField
         label="Expiry Date"
         placeholder="MM/YY"
         value={paymentInfo?.expiryDate}
         onChange={handleExpiryDateChange}
+      />
+      <TextField
+        label="CVV"
+        type="number"
+        value={paymentInfo?.cvv}
+        onChange={(event) => setPaymentInfo({...paymentInfo, cvv: event.target.value})}
       />
       <TextField
         label="Zip"

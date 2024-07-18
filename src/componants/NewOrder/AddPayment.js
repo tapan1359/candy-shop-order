@@ -3,12 +3,14 @@ import React from "react";
 
 export default function AddPayment({
   order,
+  customerName,
+  billingZipCode,
   handleSubmitPayment,
 }) {
 
   return (
     <div>
-      <PaymentFormNew order={order} submitPayment={handleSubmitPayment} />
+      <PaymentFormNew order={order} customerName={customerName} billingZipCode={billingZipCode} submitPayment={handleSubmitPayment} />
     </div>
   );
 }

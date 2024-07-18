@@ -18,7 +18,7 @@ function UpdateDataScreen() {
   const [preview, setPreview] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = React.useState(false);
   const [order, setOrder] = React.useState(null);
-  const [orderId, setOrderId] = React.useState(null);
+  const [orderId, setOrderId] = React.useState('');
   const [loading, setLoading] = React.useState(false);
 
   const handleUpdateCustomers = async () => {
@@ -125,6 +125,7 @@ function UpdateDataScreen() {
       const data = error.response.data;
       setAlertMessage({message: JSON.stringify(data?.title), severity: "error"});
       setLoading(false);
+      throw error;
     }
     finally {
       setLoading(false);
@@ -192,7 +193,12 @@ function UpdateDataScreen() {
               justifyContent: 'center',
             }}
           >
-            <PaymentFormNew order={order} submitPayment={handlePayment} />
+            <PaymentFormNew
+              order={order}
+              customerName={`${order?.billing_address?.first_name} ${order?.billing_address?.last_name}`}
+              billingZipCode={order?.billing_address?.zip}
+              submitPayment={handlePayment}
+            />
           </Box>
         </Modal>
     </div>

@@ -267,6 +267,7 @@ export default function NewOrder() {
     } catch (error) {
       const data = error.response.data;
       setAlertMessage({message: JSON.stringify(data?.title), severity: "error"});
+      throw error;
     }
   }
 
@@ -336,6 +337,8 @@ export default function NewOrder() {
       case 5:
         return <AddPayment
           order={order}
+          customerName={`${selectedCustomer?.first_name} ${selectedCustomer?.last_name}`}
+          billingZipCode={selectedBillingAddress?.postal_code}
           handleSubmitPayment={handlePayment}
         />;
       default:
