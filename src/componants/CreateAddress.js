@@ -47,7 +47,7 @@ export default function CreateAddress({buttonName, customerId, setParentAddress 
     if (localDelivery) {
       localCopyAddress.city = 'Baltimore';
       localCopyAddress.state_or_province = 'Maryland';
-      localCopyAddress.postal_code = '21201';
+      localCopyAddress.postal_code = '21215';
     }
 
     if (localCopyAddress.first_name === '' || localCopyAddress.last_name === '' || localCopyAddress.address1 === '' || localCopyAddress.city === '') {
@@ -175,56 +175,60 @@ export default function CreateAddress({buttonName, customerId, setParentAddress 
               size={"small"}
             />
 
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                gap: '10px',
-              }}
-            >
-              <TextField
-                required
-                id="city"
-                name="city"
-                label="City"
-                fullWidth
-                value={address?.city}
-                onChange={handleUpdateField}
-                margin="normal"
-                size={"small"}
-              />
+            {!localDelivery && (
+              <>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    gap: '10px',
+                  }}
+                >
+                  <TextField
+                    required
+                    id="city"
+                    name="city"
+                    label="City"
+                    fullWidth
+                    value={address?.city}
+                    onChange={handleUpdateField}
+                    margin="normal"
+                    size={"small"}
+                  />
 
-              <Autocomplete
-                id="state_or_province"
-                options={STATES}
-                getOptionLabel={(option) => option.code}
-                renderInput={(params) => <TextField {...params} label="State" margin="normal" size={"small"} />}
-                onChange={handleUpdateState}
-                value={address?.state_or_province ? STATES.find(state => state.label === address.state_or_province) : null}
-                sx={{ width: 250 }}
-              />
-            </div>
+                  <Autocomplete
+                    id="state_or_province"
+                    options={STATES}
+                    getOptionLabel={(option) => option.code}
+                    renderInput={(params) => <TextField {...params} label="State" margin="normal" size={"small"} />}
+                    onChange={handleUpdateState}
+                    value={address?.state_or_province ? STATES.find(state => state.label === address.state_or_province) : null}
+                    sx={{ width: 250 }}
+                  />
+                </div>
 
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                gap: '10px',
-              }}
-            >
-              <TextField
-                size={"small"}
-                id="postal_code"
-                name="postal_code"
-                label="Zip / Postal code"
-                fullWidth
-                value={address?.postal_code}
-                onChange={handleUpdateField}
-                margin="normal"
-              />
-            </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    gap: '10px',
+                  }}
+                >
+                  <TextField
+                    size={"small"}
+                    id="postal_code"
+                    name="postal_code"
+                    label="Zip / Postal code"
+                    fullWidth
+                    value={address?.postal_code}
+                    onChange={handleUpdateField}
+                    margin="normal"
+                  />
+                </div>
+              </>
+            )}
 
             <TextField
               id="phone"

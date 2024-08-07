@@ -1,9 +1,11 @@
+// src/componants/AddressForm.js
+
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import {
   Box, TextField, Typography, FormControl, Autocomplete, Button, Modal, Divider,
 } from '@mui/material';
-import {STATES} from '../../src/constants'
+import { STATES } from '../../src/constants';
 
 const billingInfoEmpty = {
   first_name: '',
@@ -21,16 +23,11 @@ const billingInfoEmpty = {
 
 export default function AddressForm({ title, customerId, address, setAddress }) {
   const [modalOpen, setModalOpen] = useState(false);
+  const [tempAddress, setTempAddress] = useState(address);
 
   const addresses = useSelector((state) => state.data.customers.find((c) => c.id === customerId)?.addresses);
 
-  useEffect(() => {
-    console.log("AddressForm", address);
-  }, []);
-
-
   const handleSelectBilling = async (newAddress) => {
-    console.log("handleSelectBillingCalled", newAddress);
     if (newAddress) {
       setAddress({
         id: newAddress.id,
@@ -49,16 +46,20 @@ export default function AddressForm({ title, customerId, address, setAddress }) 
     } else {
       setAddress(billingInfoEmpty);
     }
-  }
-
-  const handleUpdateField = (e) => {
-    setAddress({ ...address, [e.target.name]: e.target.value });
-  }
-
-  const handleUpdateState = (_, newValue) => {
-    setAddress({ ...address, state_or_province: newValue.label });
   };
 
+  const handleUpdateField = (e) => {
+    setTempAddress({ ...tempAddress, [e.target.name]: e.target.value });
+  };
+
+  const handleUpdateState = (_, newValue) => {
+    setTempAddress({ ...tempAddress, state_or_province: newValue.label });
+  };
+
+  const handleSave = () => {
+    setAddress(tempAddress);
+    setModalOpen(false);
+  };
 
   return (
     <Box
@@ -71,50 +72,50 @@ export default function AddressForm({ title, customerId, address, setAddress }) 
         p: 1
       }}
     >
-        <Typography variant="subtitle1">{title}</Typography>
+      <Typography variant="subtitle1">{title}</Typography>
 
-        <Autocomplete
-          disabled={!addresses}
-          id="combo-box-demo"
-          options={addresses?.length > 0 ? addresses : []}
-          getOptionLabel={(option) => `${option.first_name}, ${option.last_name}`}
-          getOptionKey={(option) => option.id}
-          renderOption={(props, option) => (
-            <Box key={option.id} component="li" {...props}>
-              <Typography variant="subtitle1">{`${option.first_name}, ${option.last_name}`}</Typography>
-              <Typography variant="subtitle2">{`${option.address1}, ${option.city}, ${option.state_or_province}, ${option.postal_code}, ${option.country}`}</Typography>
-              <Typography variant="subtitle2">{`${option.phone}`}</Typography>
-            </Box>
-          )}
-          renderInput={(params) => <TextField {...params} label="Select an Address"/>}
-          onChange={(event, newValue) => handleSelectBilling(newValue)}
-          margin="normal"
-          size={"small"}
-          value={address}
-          sx={{ width: '100%', maxWidth: '400px' }}
-          isOptionEqualToValue={(option, value) => option.id === value.id}
-        />
-        
-        {(address && address.first_name !== '') && (
-          <Box>
-            <Typography variant="subtitle1">Selected Address:</Typography>
-            <Typography variant="subtitle2">{`${address.first_name}, ${address.last_name}`}</Typography>
-            <Typography variant="subtitle2">{`${address.address1}, ${address.city}, ${address.state_or_province}, ${address.postal_code}, ${address.country}`}</Typography>
-            <Typography variant="subtitle2">{`${address.phone}`}</Typography>
-            <Typography variant="subtitle2">{`Gift Message: ${address.giftMessage}`}</Typography>
-            <Button
-              onClick={() => setModalOpen(true)}
-              disabled={address === billingInfoEmpty}
-              size={"small"}
-              variant={"outlined"}
-            >
-              Update
-            </Button>
+      <Autocomplete
+        disabled={!addresses}
+        id="combo-box-demo"
+        options={addresses?.length > 0 ? addresses : []}
+        getOptionLabel={(option) => `${option.first_name}, ${option.last_name}`}
+        getOptionKey={(option) => option.id}
+        renderOption={(props, option) => (
+          <Box key={option.id} component="li" {...props}>
+            <Typography variant="subtitle1">{`${option.first_name}, ${option.last_name}`}</Typography>
+            <Typography variant="subtitle2">{`${option.address1}, ${option.city}, ${option.state_or_province}, ${option.postal_code}, ${option.country}`}</Typography>
+            <Typography variant="subtitle2">{`${option.phone}`}</Typography>
           </Box>
-
         )}
+        renderInput={(params) => <TextField {...params} label="Select an Address" />}
+        onChange={(event, newValue) => handleSelectBilling(newValue)}
+        margin="normal"
+        size={"small"}
+        value={address}
+        sx={{ width: '100%', maxWidth: '400px' }}
+        isOptionEqualToValue={(option, value) => option.id === value.id}
+      />
 
-
+      {(address && address.first_name !== '') && (
+        <Box>
+          <Typography variant="subtitle1">Selected Address:</Typography>
+          <Typography variant="subtitle2">{`${address.first_name}, ${address.last_name}`}</Typography>
+          <Typography variant="subtitle2">{`${address.address1}, ${address.city}, ${address.state_or_province}, ${address.postal_code}, ${address.country}`}</Typography>
+          <Typography variant="subtitle2">{`${address.phone}`}</Typography>
+          <Typography variant="subtitle2">{`Gift Message: ${address.giftMessage}`}</Typography>
+          <Button
+            onClick={() => {
+              setTempAddress(address);
+              setModalOpen(true);
+            }}
+            disabled={address === billingInfoEmpty}
+            size={"small"}
+            variant={"outlined"}
+          >
+            Update
+          </Button>
+        </Box>
+      )}
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <Box
@@ -149,7 +150,7 @@ export default function AddressForm({ title, customerId, address, setAddress }) 
                 name="first_name"
                 label="First name"
                 fullWidth
-                value={address?.first_name}
+                value={tempAddress?.first_name}
                 onChange={handleUpdateField}
                 margin="normal"
                 size={"small"}
@@ -161,7 +162,7 @@ export default function AddressForm({ title, customerId, address, setAddress }) 
                 name="last_name"
                 label="Last name"
                 fullWidth
-                value={address?.last_name}
+                value={tempAddress?.last_name}
                 onChange={handleUpdateField}
                 margin="normal"
                 size={"small"}
@@ -174,7 +175,7 @@ export default function AddressForm({ title, customerId, address, setAddress }) 
               name="address1"
               label="Address line 1"
               fullWidth
-              value={address?.address1}
+              value={tempAddress?.address1}
               onChange={handleUpdateField}
               margin="normal"
               size={"small"}
@@ -185,7 +186,7 @@ export default function AddressForm({ title, customerId, address, setAddress }) 
               name="address2"
               label="Address line 2"
               fullWidth
-              value={address?.address2}
+              value={tempAddress?.address2}
               onChange={handleUpdateField}
               margin="normal"
               size={"small"}
@@ -205,29 +206,19 @@ export default function AddressForm({ title, customerId, address, setAddress }) 
                 name="city"
                 label="City"
                 fullWidth
-                value={address?.city}
+                value={tempAddress?.city}
                 onChange={handleUpdateField}
                 margin="normal"
                 size={"small"}
               />
 
-              {/* <TextField
-                id="state"
-                name="state"
-                label="State/Province/Region"
-                fullWidth
-                value={address?.state}
-                onChange={handleUpdateField}
-                margin="normal"
-                size={"small"}
-              /> */}
               <Autocomplete
                 id="state_or_province"
                 options={STATES}
                 getOptionLabel={(option) => option.code}
                 renderInput={(params) => <TextField {...params} label="State" margin="normal" size={"small"} />}
                 onChange={handleUpdateState}
-                value={address?.state_or_province ? STATES.find(state => state.label === address.state_or_province) : null}
+                value={tempAddress?.state_or_province ? STATES.find(state => state.label === tempAddress.state_or_province) : null}
               />
             </div>
 
@@ -246,7 +237,7 @@ export default function AddressForm({ title, customerId, address, setAddress }) 
                 name="postal_code"
                 label="Zip / Postal code"
                 fullWidth
-                value={address?.postal_code}
+                value={tempAddress?.postal_code}
                 onChange={handleUpdateField}
                 margin="normal"
               />
@@ -257,7 +248,7 @@ export default function AddressForm({ title, customerId, address, setAddress }) 
                 name="country"
                 label="Country"
                 fullWidth
-                value={address?.country}
+                value={tempAddress?.country}
                 onChange={handleUpdateField}
                 margin="normal"
                 size={"small"}
@@ -270,7 +261,7 @@ export default function AddressForm({ title, customerId, address, setAddress }) 
               name="phone"
               label="Phone Number"
               fullWidth
-              value={address?.phone}
+              value={tempAddress?.phone}
               onChange={handleUpdateField}
               margin="normal"
               size={"small"}
@@ -280,18 +271,35 @@ export default function AddressForm({ title, customerId, address, setAddress }) 
               name="giftMessage"
               label="Gift Message"
               fullWidth
-              value={address?.giftMessage}
+              value={tempAddress?.giftMessage}
               onChange={handleUpdateField}
               margin="normal"
               size={"small"}
             />
-            <Button
-              onClick={() => setModalOpen(false)}
-              size={"small"}
-              variant={"outlined"}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                gap: '10px',
+                marginTop: '10px',
+              }}
             >
-              Close
-            </Button>
+              <Button
+                onClick={() => setModalOpen(false)}
+                size={"small"}
+                variant={"outlined"}
+              >
+                Close
+              </Button>
+              <Button
+                onClick={handleSave}
+                size={"small"}
+                variant={"contained"}
+              >
+                Save
+              </Button>
+            </div>
           </FormControl>
         </Box>
       </Modal>

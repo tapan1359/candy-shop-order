@@ -23,5 +23,9 @@ country_code: 'US',
 ```
 city = 'Baltimore';
 state_or_province = 'Maryland';
-postal_code = '21201';
+postal_code = '21215';
 ```
+
+##### Payment:
+- By default payment api checks billing address zipcode. if it's different then put it on the 
+payment form and it will update the address

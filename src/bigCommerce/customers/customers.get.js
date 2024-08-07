@@ -1,20 +1,16 @@
 import { api_bigCommerce } from '../api/api.bigCommerce';
 
 export const searchCustomers = async (params) => {
-  console.log('searchCustomers', params);
   const response = await api_bigCommerce.get('/v3/customers/addresses', {
     params,
   });
-  console.log('searchCustomers response', response);
   return response.data;
 };
 
 export const getCustomers = async (params) => {
-  console.log('getCustomers', params);
   const response = await api_bigCommerce.get('/v3/customers', {
     params,
   });
-  console.log('getCustomers response', response);
   return response.data;
 };
 
@@ -68,10 +64,8 @@ export const getAllCustomers = async () => {
 };
 
 export const getCustomerAddresses = async (params) => {
-  console.log('searchCustomers', params);
   const response = await api_bigCommerce.get('/v3/customers/addresses', {
     params,
   });
-  console.log('getCustomerAddresses response', response);
   return response.data;
 };
