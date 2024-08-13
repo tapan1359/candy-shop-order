@@ -78,6 +78,16 @@ export default function Shipping({customerId, products, consignment, updateConsi
 
   const handleModalAddItem = () => {
     if (modelItem) {
+      if (modelItem.name === '') {
+        setAlertMessage({severity: "error", message: "Please select a product!"});
+        return;
+      } else if (modelItem.price === '') {
+        setAlertMessage({severity: "error", message: "Please enter a price!"});
+        return;
+      } else if (modelItem.quantity === '' || modelItem.quantity == 0) {
+        setAlertMessage({severity: "error", message: "Please enter a quantity!"});
+        return;
+      }
       consignment.items = [...consignment.items, modelItem];
     }
     setModalOpen(false);
@@ -238,7 +248,7 @@ export default function Shipping({customerId, products, consignment, updateConsi
               onChange={(event, newValue) => handleSelectModelItem(newValue)}
               filterOptions={(options, state) => options.filter((option) => option.name.toLowerCase().includes(state.inputValue.toLowerCase()) || option.sku.toLowerCase().includes(state.inputValue.toLowerCase()))}
               freeSolo
-              // onInputChange={(e, value) => handleManualInputChange(value)}
+              onInputChange={(e, value) => handleManualInputChange(value)}
             />
             <TextField
               sx={{ width: 300 }}
