@@ -1,6 +1,5 @@
 import {Box, Button, TextField, Typography} from "@mui/material";
-import React from "react";
-
+import React, { useRef } from "react";
 
 export function PaymentFormNew({
   order,
@@ -17,6 +16,13 @@ export function PaymentFormNew({
     zipcode: billingZipCode,
   });
   const [loading, setLoading] = React.useState(false);
+
+  const nameOnCardRef = useRef();
+  const cardNumberRef = useRef();
+  const expiryDateRef = useRef();
+  const cvvRef = useRef();
+  const zipcodeRef = useRef();
+  const submitButtonRef = useRef();
 
   const handleSubmit = async () => {
     let updatedPaymentInfo = {...paymentInfo};
@@ -39,7 +45,6 @@ export function PaymentFormNew({
     } catch (error) {
       setLoading(false);
     }
-
   };
 
   const handleExpiryDateChange = (event) => {
@@ -52,12 +57,18 @@ export function PaymentFormNew({
     setPaymentInfo({...paymentInfo, expiryDate: value});
   };
 
+  const handleKeyDown = (event, nextRef) => {
+    if (event.key === 'Enter' || event.key === 'Tab') {
+      event.preventDefault();
+      nextRef.current.focus();
+    }
+  };
+
   return (
     <Box
       sx={{
         bgcolor: 'background.paper',
         borderRadius: '8px',
-        // boxShadow: 24,
         p: 4,
         gap: 2,
         display: 'flex',
@@ -72,35 +83,46 @@ export function PaymentFormNew({
         label="Name on Card"
         value={paymentInfo?.nameOnCard}
         onChange={(event) => setPaymentInfo({...paymentInfo, nameOnCard: event.target.value})}
+        inputRef={nameOnCardRef}
+        onKeyDown={(event) => handleKeyDown(event, cardNumberRef)}
       />
       <TextField
         label="Card Number"
         type="number"
         value={paymentInfo?.cardNumber}
         onChange={(event) => setPaymentInfo({...paymentInfo, cardNumber: event.target.value})}
+        inputRef={cardNumberRef}
+        onKeyDown={(event) => handleKeyDown(event, expiryDateRef)}
       />
       <TextField
         label="Expiry Date"
         placeholder="MM/YY"
         value={paymentInfo?.expiryDate}
         onChange={handleExpiryDateChange}
+        inputRef={expiryDateRef}
+        onKeyDown={(event) => handleKeyDown(event, cvvRef)}
       />
       <TextField
         label="CVV"
         type="number"
         value={paymentInfo?.cvv}
         onChange={(event) => setPaymentInfo({...paymentInfo, cvv: event.target.value})}
+        inputRef={cvvRef}
+        onKeyDown={(event) => handleKeyDown(event, zipcodeRef)}
       />
       <TextField
         label="Zip"
         type="number"
         value={paymentInfo?.zipcode}
         onChange={(event) => setPaymentInfo({...paymentInfo, zipcode: event.target.value})}
+        inputRef={zipcodeRef}
+        onKeyDown={(event) => handleKeyDown(event, submitButtonRef)}
       />
       <Button
         onClick={handleSubmit}
         variant={"contained"}
         disabled={loading}
+        ref={submitButtonRef}
       >
         {loading ? "Loading..." : "Submit Payment"}
       </Button>
